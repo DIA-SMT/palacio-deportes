@@ -81,7 +81,7 @@ export default function EventosPage() {
               Todos los Eventos
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-balance">
-              Encontrá el evento perfecto para vos
+              Encontrá el evento perfecto para vos!
             </p>
           </div>
 
