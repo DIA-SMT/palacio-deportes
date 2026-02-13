@@ -64,7 +64,7 @@ export function Header() {
           <div className="hidden md:flex items-center gap-4">
             <ModeToggle />
             <Button asChild className="bg-accent hover:bg-accent/90 text-accent-foreground">
-              <Link href="https://example.com/tickets" target="_blank" rel="noopener noreferrer">
+              <Link href="http://ticketweb.com.ar/" target="_blank" rel="noopener noreferrer">
                 <Ticket className="mr-2 h-4 w-4" />
                 Comprar Entradas
               </Link>
@@ -101,7 +101,7 @@ export function Header() {
                   ))}
                 </nav>
                 <Button asChild className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-                  <Link href="https://example.com/tickets" target="_blank" rel="noopener noreferrer">
+                  <Link href="http://ticketweb.com.ar/" target="_blank" rel="noopener noreferrer">
                     <Ticket className="mr-2 h-4 w-4" />
                     Comprar Entradas
                   </Link>

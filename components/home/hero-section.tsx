@@ -44,7 +44,7 @@ export function HeroSection() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="text-base bg-transparent">
-              <Link href="https://example.com/tickets" target="_blank" rel="noopener noreferrer">
+              <Link href="http://ticketweb.com.ar/" target="_blank" rel="noopener noreferrer">
                 <Ticket className="mr-2 h-5 w-5" />
                 Comprar Entradas
               </Link>
