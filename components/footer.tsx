@@ -147,7 +147,10 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground text-center md:text-left">
-            © {currentYear} Municipalidad de San Miguel de Tucumán. Todos los derechos reservados.
+            © {currentYear} Municipalidad de San Miguel de Tucumán.
+          </p>
+          <p className="text-sm text-muted-foreground text-center md:text-left">
+            Desarrollado por la Dirección de Inteligencia Artificial.
           </p>
           <div className="flex gap-6">
             <Link

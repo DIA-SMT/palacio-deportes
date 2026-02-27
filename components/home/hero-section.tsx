@@ -19,8 +19,8 @@ export function HeroSection() {
         >
           <source src="/sape.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,hsl(var(--background))_100%)]" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0.4) 50%, #0a0a0a 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, transparent 0%, #0a0a0a 100%)' }} />
       </div>
 
       {/* Content */}
