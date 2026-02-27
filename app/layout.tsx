@@ -1,9 +1,11 @@
 import React from "react"
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
+import dynamic from 'next/dynamic'
 
 import './globals.css'
 import { ThemeProvider } from "@/components/theme-provider"
+import { AssistantWrapper } from "@/components/chat/assistant-wrapper"
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -41,6 +43,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <AssistantWrapper />
         </ThemeProvider>
       </body>
     </html>
