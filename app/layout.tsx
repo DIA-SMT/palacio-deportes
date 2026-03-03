@@ -15,7 +15,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: 'Palacio de los Deportes | San Miguel de Tucumán',
-  description: 'El mejor espacio para recitales, eventos culturales, transmisiones deportivas y más en Tucumán. Descubrí la agenda y comprá tus entradas.',
+  description: 'El Palacio de los Deportes de San Miguel de Tucumán se renueva. Somos el punto de referencia para los eventos más importantes de la región: deporte, música y cultura se encuentran bajo un mismo techo. Explora nuestra cartelera, conoce nuestras instalaciones y vive experiencias inolvidables en el estadio más emblemático del Jardín de la República.',
   generator: 'v0.app',
   keywords: ['Palacio de los Deportes', 'Tucumán', 'eventos', 'recitales', 'San Miguel de Tucumán', 'entretenimiento'],
   icons: {
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Palacio de los Deportes | San Miguel de Tucumán',
-    description: 'El mejor espacio para recitales, eventos culturales y transmisiones deportivas en Tucumán.',
+    description: 'El Palacio de los Deportes de San Miguel de Tucumán se renueva. Somos el punto de referencia para los eventos más importantes de la región: deporte, música y cultura se encuentran bajo un mismo techo. Explora nuestra cartelera, conoce nuestras instalaciones y vive experiencias inolvidables en el estadio más emblemático del Jardín de la República.',
     type: 'website',
   }
 }
