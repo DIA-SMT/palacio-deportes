@@ -49,7 +49,7 @@ export function HeroSection() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 px-6 text-base font-semibold border-2 hover:bg-white/5 transition-all hover:scale-105 active:scale-95">
-              <Link href="https://example.com/tickets" target="_blank" rel="noopener noreferrer">
+              <Link href="http://ticketweb.com.ar/" target="_blank" rel="noopener noreferrer">
                 <Ticket className="mr-2 h-4 w-4" />
                 Comprar Entradas
               </Link>
