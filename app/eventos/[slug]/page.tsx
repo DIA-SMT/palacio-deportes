@@ -1,32 +1,48 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Calendar, Clock, MapPin, Share2, ExternalLink, AlertCircle } from 'lucide-react';
-import { events } from '@/data/events';
+import { getEventBySlug, getEvents, Event } from '@/data/events';
 
-interface PageProps {
-  params: Promise<{ slug: string }>;
-}
+export default function EventDetailPage() {
+  const params = useParams();
+  const slug = params.slug as string;
 
-export async function generateStaticParams() {
-  return events.map((event) => ({
-    slug: event.slug,
-  }));
-}
+  const [event, setEvent] = useState<Event | null>(null);
+  const [similarEvents, setSimilarEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-export default async function EventDetailPage({ params }: PageProps) {
-  const { slug } = await params;
-  const event = events.find((e) => e.slug === slug);
+  useEffect(() => {
+    async function fetchEvent() {
+      const eventData = await getEventBySlug(slug);
+      if (!eventData) {
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+      setEvent(eventData);
 
-  if (!event) {
-    notFound();
-  }
+      // Fetch similar events
+      const allEvents = await getEvents();
+      const similar = allEvents
+        .filter((e) => e.category === eventData.category && e.id !== eventData.id)
+        .slice(0, 3);
+      setSimilarEvents(similar);
+      setLoading(false);
+    }
+    fetchEvent();
+  }, [slug]);
 
   const getCategoryLabel = (category: string) => {
     const labels = {
@@ -59,12 +75,51 @@ export default async function EventDetailPage({ params }: PageProps) {
     }).format(date);
   };
 
-  const statusBadge = getStatusBadge(event.status);
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <main className="pt-24 pb-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <Skeleton className="h-6 w-64 mb-6" />
+            <Skeleton className="aspect-[21/9] w-full rounded-2xl mb-8" />
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-6">
+                <Skeleton className="h-10 w-3/4" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-5/6" />
+                <Skeleton className="h-4 w-4/6" />
+              </div>
+              <div>
+                <Skeleton className="h-64 w-full rounded-lg" />
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
-  // Get similar events (same category, different event)
-  const similarEvents = events
-    .filter((e) => e.category === event.category && e.id !== event.id)
-    .slice(0, 3);
+  if (notFound || !event) {
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <main className="pt-24 pb-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center py-16">
+            <h1 className="text-3xl font-bold text-foreground mb-4">Evento no encontrado</h1>
+            <p className="text-muted-foreground mb-6">El evento que buscás no existe o fue eliminado.</p>
+            <Button asChild>
+              <Link href="/eventos">Ver todos los eventos</Link>
+            </Button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const statusBadge = getStatusBadge(event.status);
 
   return (
     <div className="min-h-screen">

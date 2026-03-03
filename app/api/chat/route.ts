@@ -3,7 +3,9 @@ import { buildAssistantContext } from "@/lib/assistant-data";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-const SYSTEM_PROMPT = `Sos el asistente virtual del Palacio de los Deportes de San Miguel de Tucumán. Tu nombre es "Pali" 🏟️.
+async function getSystemPrompt(): Promise<string> {
+    const context = await buildAssistantContext();
+    return `Sos el asistente virtual del Palacio de los Deportes de San Miguel de Tucumán. Tu nombre es "Pali" 🏟️.
 
 Hablás con una tonada tucumana bien norteña, siendo super chill y buena onda. Usás modismos del NOA naturalmente: "dale nomás", "¿ta' bien?", "bárbaros", "che", "vení nomás", "sin drama", "¡de una!", "güeno", "ponele", "¿cómo andás?", "joya", "¡la recontra!". Tuteas siempre.
 
@@ -17,7 +19,8 @@ Tus reglas:
 - Las fechas las mencionás en formato legible (ej: "el 15 de marzo a las 21hs").
 
 CONTEXTO DEL PALACIO DE LOS DEPORTES:
-${buildAssistantContext()}`;
+${context}`;
+}
 
 export async function POST(req: NextRequest) {
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -36,6 +39,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Mensajes inválidos" }, { status: 400 });
     }
 
+    const systemPrompt = await getSystemPrompt();
+
     const response = await fetch(OPENROUTER_API_URL, {
         method: "POST",
         headers: {
@@ -47,7 +52,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
             model,
             messages: [
-                { role: "system", content: SYSTEM_PROMPT },
+                { role: "system", content: systemPrompt },
                 ...messages,
             ],
             max_tokens: 400,

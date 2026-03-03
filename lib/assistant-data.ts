@@ -1,11 +1,11 @@
-import { events } from "@/data/events";
+import { getEvents, Event } from "@/data/events";
 import { faqs } from "@/data/faqs";
 
 /**
  * Genera el contexto completo del Palacio de los Deportes
  * para incluirlo en el system prompt del asistente virtual.
  */
-export function buildAssistantContext(): string {
+export async function buildAssistantContext(): Promise<string> {
     const now = new Date();
     const currentDate = now.toLocaleDateString("es-AR", {
         weekday: "long",
@@ -15,6 +15,7 @@ export function buildAssistantContext(): string {
     });
 
     // ─── Eventos ────────────────────────────────────────────────────────────────
+    const events = await getEvents();
     const eventsContext = events
         .map((e) => {
             const date = new Date(e.dateISO + "T00:00:00");
