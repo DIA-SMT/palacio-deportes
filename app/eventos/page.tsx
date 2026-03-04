@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -8,17 +8,36 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, Clock, Search, ExternalLink } from 'lucide-react';
-import { events, EventCategory } from '@/data/events';
+import { getEvents, Event, EventCategory } from '@/data/events';
 
 export default function EventosPage() {
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<EventCategory | 'todas'>('todas');
   const [priceFilter, setPriceFilter] = useState<'todos' | 'gratis' | 'pago'>('todos');
+  const [yearFilter, setYearFilter] = useState<string>('todos');
+
+  useEffect(() => {
+    async function fetchEvents() {
+      const events = await getEvents();
+      setAllEvents(events);
+      setLoading(false);
+    }
+    fetchEvents();
+  }, []);
+
+  // Extract unique years from events data
+  const availableYears = useMemo(() => {
+    const years = [...new Set(allEvents.map((e) => new Date(e.dateISO).getFullYear()))];
+    return years.sort((a, b) => b - a);
+  }, [allEvents]);
 
   const filteredEvents = useMemo(() => {
-    return events.filter((event) => {
+    return allEvents.filter((event) => {
       // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
@@ -38,9 +57,15 @@ export default function EventosPage() {
       if (priceFilter === 'gratis' && !event.isFree) return false;
       if (priceFilter === 'pago' && event.isFree) return false;
 
+      // Year filter
+      if (yearFilter !== 'todos') {
+        const eventYear = new Date(event.dateISO).getFullYear().toString();
+        if (eventYear !== yearFilter) return false;
+      }
+
       return true;
     }).sort((a, b) => new Date(a.dateISO).getTime() - new Date(b.dateISO).getTime());
-  }, [searchQuery, categoryFilter, priceFilter]);
+  }, [allEvents, searchQuery, categoryFilter, priceFilter, yearFilter]);
 
   const categories = [
     { value: 'todas' as const, label: 'Todas' },
@@ -99,6 +124,27 @@ export default function EventosPage() {
               />
             </div>
 
+            {/* Year Filter */}
+            <div className="flex gap-2 justify-center flex-wrap">
+              <Button
+                variant={yearFilter === 'todos' ? 'default' : 'outline'}
+                onClick={() => setYearFilter('todos')}
+                size="sm"
+              >
+                Todos los años
+              </Button>
+              {availableYears.map((year) => (
+                <Button
+                  key={year}
+                  variant={yearFilter === year.toString() ? 'default' : 'outline'}
+                  onClick={() => setYearFilter(year.toString())}
+                  size="sm"
+                >
+                  {year}
+                </Button>
+              ))}
+            </div>
+
             {/* Category Tabs */}
             <Tabs
               value={categoryFilter}
@@ -142,11 +188,24 @@ export default function EventosPage() {
 
           {/* Results Count */}
           <div className="mb-6 text-center text-sm text-muted-foreground">
-            {filteredEvents.length} {filteredEvents.length === 1 ? 'evento encontrado' : 'eventos encontrados'}
+            {loading ? 'Cargando eventos...' : `${filteredEvents.length} ${filteredEvents.length === 1 ? 'evento encontrado' : 'eventos encontrados'}`}
           </div>
 
           {/* Events Grid */}
-          {filteredEvents.length > 0 ? (
+          {loading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <Card key={i} className="overflow-hidden">
+                  <Skeleton className="aspect-[4/3] w-full" />
+                  <CardContent className="p-5 space-y-3">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className="h-4 w-5/6" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : filteredEvents.length > 0 ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredEvents.map((event) => {
                 const statusBadge = getStatusBadge(event.status);
@@ -212,6 +271,7 @@ export default function EventosPage() {
                   setSearchQuery('');
                   setCategoryFilter('todas');
                   setPriceFilter('todos');
+                  setYearFilter('todos');
                 }}
               >
                 Limpiar filtros
