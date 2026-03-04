@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, Clock, Search, ExternalLink } from 'lucide-react';
 import { getEvents, Event, EventCategory } from '@/data/events';
 
@@ -19,7 +18,7 @@ export default function EventosPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<EventCategory | 'todas'>('todas');
   const [priceFilter, setPriceFilter] = useState<'todos' | 'gratis' | 'pago'>('todos');
-  const [yearFilter, setYearFilter] = useState<string>('todos');
+  const [timeFilter, setTimeFilter] = useState<'todos' | 'anteriores' | 'proximos'>('todos');
 
   useEffect(() => {
     async function fetchEvents() {
@@ -29,12 +28,6 @@ export default function EventosPage() {
     }
     fetchEvents();
   }, []);
-
-  // Extract unique years from events data
-  const availableYears = useMemo(() => {
-    const years = [...new Set(allEvents.map((e) => new Date(e.dateISO).getFullYear()))];
-    return years.sort((a, b) => b - a);
-  }, [allEvents]);
 
   const filteredEvents = useMemo(() => {
     return allEvents.filter((event) => {
@@ -57,15 +50,20 @@ export default function EventosPage() {
       if (priceFilter === 'gratis' && !event.isFree) return false;
       if (priceFilter === 'pago' && event.isFree) return false;
 
-      // Year filter
-      if (yearFilter !== 'todos') {
-        const eventYear = new Date(event.dateISO).getFullYear().toString();
-        if (eventYear !== yearFilter) return false;
+      // Time filter
+      if (timeFilter !== 'todos') {
+        const eventDate = new Date(event.dateISO);
+        eventDate.setHours(0, 0, 0, 0);
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+
+        if (timeFilter === 'anteriores' && eventDate >= now) return false;
+        if (timeFilter === 'proximos' && eventDate < now) return false;
       }
 
       return true;
     }).sort((a, b) => new Date(a.dateISO).getTime() - new Date(b.dateISO).getTime());
-  }, [allEvents, searchQuery, categoryFilter, priceFilter, yearFilter]);
+  }, [allEvents, searchQuery, categoryFilter, priceFilter, timeFilter]);
 
   const categories = [
     { value: 'todas' as const, label: 'Todas' },
@@ -124,43 +122,49 @@ export default function EventosPage() {
               />
             </div>
 
-            {/* Year Filter */}
+            {/* Time Filter */}
             <div className="flex gap-2 justify-center flex-wrap">
               <Button
-                variant={yearFilter === 'todos' ? 'default' : 'outline'}
-                onClick={() => setYearFilter('todos')}
+                variant={timeFilter === 'todos' ? 'default' : 'outline'}
+                onClick={() => setTimeFilter('todos')}
                 size="sm"
               >
-                Todos los años
+                Todos
               </Button>
-              {availableYears.map((year) => (
+              <Button
+                variant={timeFilter === 'proximos' ? 'default' : 'outline'}
+                onClick={() => setTimeFilter('proximos')}
+                size="sm"
+              >
+                Próximos
+              </Button>
+              <Button
+                variant={timeFilter === 'anteriores' ? 'default' : 'outline'}
+                onClick={() => setTimeFilter('anteriores')}
+                size="sm"
+              >
+                Anteriores
+              </Button>
+            </div>
+
+            {/* Category Filter - Comentado temporalmente por pedido del usuario */}
+            {/* 
+            <div className="flex gap-2 justify-center flex-wrap">
+              {categories.map((cat) => (
                 <Button
-                  key={year}
-                  variant={yearFilter === year.toString() ? 'default' : 'outline'}
-                  onClick={() => setYearFilter(year.toString())}
+                  key={cat.value}
+                  variant={categoryFilter === cat.value ? 'default' : 'outline'}
+                  onClick={() => setCategoryFilter(cat.value)}
                   size="sm"
                 >
-                  {year}
+                  {cat.label}
                 </Button>
               ))}
             </div>
+            */}
 
-            {/* Category Tabs */}
-            <Tabs
-              value={categoryFilter}
-              onValueChange={(value) => setCategoryFilter(value as EventCategory | 'todas')}
-              className="w-full"
-            >
-              <TabsList className="w-full justify-start overflow-x-auto flex-nowrap">
-                {categories.map((cat) => (
-                  <TabsTrigger key={cat.value} value={cat.value} className="whitespace-nowrap">
-                    {cat.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-
-            {/* Price Filter */}
+            {/* Price Filter - Comentado temporalmente por pedido del usuario */}
+            {/* 
             <div className="flex gap-2 justify-center flex-wrap">
               <Button
                 variant={priceFilter === 'todos' ? 'default' : 'outline'}
@@ -184,6 +188,7 @@ export default function EventosPage() {
                 Con Entrada
               </Button>
             </div>
+            */}
           </div>
 
           {/* Results Count */}
@@ -271,7 +276,7 @@ export default function EventosPage() {
                   setSearchQuery('');
                   setCategoryFilter('todas');
                   setPriceFilter('todos');
-                  setYearFilter('todos');
+                  setTimeFilter('todos');
                 }}
               >
                 Limpiar filtros
