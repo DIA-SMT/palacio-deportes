@@ -9,6 +9,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Skeleton } from '@/components/ui/skeleton';
 import { Calendar, Clock, ExternalLink } from 'lucide-react';
 import { getEvents, Event } from '@/data/events';
+import { isPastEvent } from '@/lib/utils';
 
 export function EventsCarousel() {
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
@@ -99,14 +100,14 @@ export function EventsCarousel() {
                 const statusBadge = getStatusBadge(event.status);
                 return (
                   <CarouselItem key={event.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                    <Card className="h-full flex flex-col overflow-hidden group">
+                    <Card className="h-full flex flex-col overflow-hidden group hover:border-primary/50 transition-colors relative">
                       <div className="relative aspect-[4/3] overflow-hidden">
                         <img
                           src={event.image || "/placeholder.svg"}
                           alt={event.title}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                         />
-                        <div className="absolute top-3 left-3 flex gap-2">
+                        <div className="absolute top-3 left-3 flex gap-2 z-20">
                           <Badge variant="secondary" className="backdrop-blur-sm bg-background/80">
                             {getCategoryLabel(event.category)}
                           </Badge>
@@ -127,7 +128,9 @@ export function EventsCarousel() {
                           </div>
                         </div>
                         <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2 group-hover:text-accent transition-colors">
-                          {event.title}
+                          <Link href={`/eventos/${event.slug}`} className="after:absolute after:inset-0 after:z-10">
+                            {event.title}
+                          </Link>
                         </h3>
                         <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                           {event.shortDescription}
@@ -137,11 +140,8 @@ export function EventsCarousel() {
                           <span className="text-sm font-semibold text-foreground">{event.priceLabel}</span>
                         </div>
                       </CardContent>
-                      <CardFooter className="p-5 pt-0 flex gap-2">
-                        <Button asChild variant="outline" className="flex-1 bg-transparent">
-                          <Link href={`/eventos/${event.slug}`}>Ver Detalle</Link>
-                        </Button>
-                        {event.ticketUrl && event.status !== 'agotado' && (
+                      <CardFooter className="p-5 pt-0 flex gap-2 relative z-20">
+                        {event.ticketUrl && event.status !== 'agotado' && !isPastEvent(event.dateISO) && (
                           <Button asChild className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground">
                             <Link href={event.ticketUrl} target="_blank" rel="noopener noreferrer">
                               Comprar

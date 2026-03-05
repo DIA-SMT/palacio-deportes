@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Calendar, Clock, MapPin, Share2, ExternalLink, AlertCircle } from 'lucide-react';
 import { getEventBySlug, getEvents, Event } from '@/data/events';
+import { isPastEvent } from '@/lib/utils';
 
 export default function EventDetailPage() {
   const params = useParams();
@@ -287,7 +288,7 @@ export default function EventDetailPage() {
                   <Separator />
 
                   <div className="space-y-3">
-                    {event.ticketUrl && event.status !== 'agotado' && (
+                    {event.ticketUrl && event.status !== 'agotado' && !isPastEvent(event.dateISO) && (
                       <Button asChild className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" size="lg">
                         <Link href={event.ticketUrl} target="_blank" rel="noopener noreferrer">
                           Comprar Entradas
@@ -330,7 +331,7 @@ export default function EventDetailPage() {
                 {similarEvents.map((similarEvent) => {
                   const simStatusBadge = getStatusBadge(similarEvent.status);
                   return (
-                    <Card key={similarEvent.id} className="overflow-hidden group">
+                    <Card key={similarEvent.id} className="overflow-hidden group relative hover:border-primary/50 transition-colors">
                       <div className="relative aspect-[4/3] overflow-hidden">
                         <img
                           src={similarEvent.image || "/placeholder.svg"}
@@ -340,16 +341,15 @@ export default function EventDetailPage() {
                       </div>
                       <CardContent className="p-5">
                         <h3 className="text-lg font-bold text-foreground mb-2 line-clamp-2 group-hover:text-accent transition-colors">
-                          {similarEvent.title}
+                          <Link href={`/eventos/${similarEvent.slug}`} className="after:absolute after:inset-0 after:z-10">
+                            {similarEvent.title}
+                          </Link>
                         </h3>
                         <p className="text-sm text-muted-foreground mb-3">
                           {formatDate(similarEvent.dateISO)}
                         </p>
                         <div className="flex items-center justify-between">
                           <Badge variant={simStatusBadge.variant}>{simStatusBadge.label}</Badge>
-                          <Button asChild variant="link" className="px-0 h-auto">
-                            <Link href={`/eventos/${similarEvent.slug}`}>Ver detalle</Link>
-                          </Button>
                         </div>
                       </CardContent>
                     </Card>
