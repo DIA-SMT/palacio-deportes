@@ -99,6 +99,7 @@ export default function AdminEventsPage() {
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState<EventStatus | 'todos'>('todos');
 
     // Dialog state
     const [formOpen, setFormOpen] = useState(false);
@@ -128,8 +129,9 @@ export default function AdminEventsPage() {
         fetchEvents();
     }, [fetchEvents]);
 
-    // Filter events by search
+    // Filter events by search and status
     const filteredEvents = events.filter((event) => {
+        if (statusFilter !== 'todos' && event.status !== statusFilter) return false;
         if (!searchQuery) return true;
         const q = searchQuery.toLowerCase();
         return (
@@ -323,7 +325,10 @@ export default function AdminEventsPage() {
 
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card>
+                <Card
+                    className={`cursor-pointer transition-colors hover:border-foreground/40 ${statusFilter === 'todos' ? 'border-foreground/60 bg-muted/40' : ''}`}
+                    onClick={() => setStatusFilter('todos')}
+                >
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">Total</CardTitle>
                     </CardHeader>
@@ -331,7 +336,10 @@ export default function AdminEventsPage() {
                         <p className="text-2xl font-bold">{events.length}</p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card
+                    className={`cursor-pointer transition-colors hover:border-green-500/40 ${statusFilter === 'disponible' ? 'border-green-500/60 bg-green-500/5' : ''}`}
+                    onClick={() => setStatusFilter(statusFilter === 'disponible' ? 'todos' : 'disponible')}
+                >
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">Disponibles</CardTitle>
                     </CardHeader>
@@ -341,7 +349,10 @@ export default function AdminEventsPage() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card
+                    className={`cursor-pointer transition-colors hover:border-orange-500/40 ${statusFilter === 'ultimos' ? 'border-orange-500/60 bg-orange-500/5' : ''}`}
+                    onClick={() => setStatusFilter(statusFilter === 'ultimos' ? 'todos' : 'ultimos')}
+                >
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">Últimos lugares</CardTitle>
                     </CardHeader>
@@ -351,7 +362,10 @@ export default function AdminEventsPage() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card
+                    className={`cursor-pointer transition-colors hover:border-red-500/40 ${statusFilter === 'agotado' ? 'border-red-500/60 bg-red-500/5' : ''}`}
+                    onClick={() => setStatusFilter(statusFilter === 'agotado' ? 'todos' : 'agotado')}
+                >
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">Agotados</CardTitle>
                     </CardHeader>
@@ -374,7 +388,7 @@ export default function AdminEventsPage() {
                         </div>
                     ) : filteredEvents.length === 0 ? (
                         <div className="p-12 text-center text-muted-foreground">
-                            {searchQuery ? 'No se encontraron eventos con esa búsqueda' : 'No hay eventos cargados aún'}
+                            {searchQuery || statusFilter !== 'todos' ? 'No se encontraron eventos con esos filtros' : 'No hay eventos cargados aún'}
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
