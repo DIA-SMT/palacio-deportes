@@ -15,7 +15,7 @@ interface Stat {
 const stats: Stat[] = [
   {
     icon: Users,
-    value: 8500,
+    value: 1000,
     suffix: '',
     label: 'Capacidad',
   },
@@ -27,7 +27,7 @@ const stats: Stat[] = [
   },
   {
     icon: Calendar,
-    value: 35,
+    value: 10,
     suffix: '+',
     label: 'Eventos por mes',
   },

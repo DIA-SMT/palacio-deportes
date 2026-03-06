@@ -19,7 +19,7 @@ export default function EventosPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<EventCategory | 'todas'>('todas');
   const [priceFilter, setPriceFilter] = useState<'todos' | 'gratis' | 'pago'>('todos');
-  const [timeFilter, setTimeFilter] = useState<'todos' | 'anteriores' | 'proximos'>('todos');
+  const [timeFilter, setTimeFilter] = useState<'todos' | 'anteriores' | 'proximos'>('proximos');
 
   useEffect(() => {
     async function fetchEvents() {
@@ -165,7 +165,7 @@ export default function EventosPage() {
             */}
 
             {/* Price Filter - Comentado temporalmente por pedido del usuario */}
-            {/* 
+
             <div className="flex gap-2 justify-center flex-wrap">
               <Button
                 variant={priceFilter === 'todos' ? 'default' : 'outline'}
@@ -189,7 +189,7 @@ export default function EventosPage() {
                 Con Entrada
               </Button>
             </div>
-            */}
+
           </div>
 
           {/* Results Count */}
@@ -249,7 +249,11 @@ export default function EventosPage() {
                         {event.shortDescription}
                       </p>
                       <div className="flex items-center justify-between">
-                        <Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>
+                        {isPastEvent(event.dateISO) ? (
+                          <Badge variant="secondary">Finalizado</Badge>
+                        ) : (
+                          <Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>
+                        )}
                         <span className="text-sm font-semibold text-foreground">{event.priceLabel}</span>
                       </div>
                     </CardContent>
