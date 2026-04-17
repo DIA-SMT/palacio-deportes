@@ -504,15 +504,21 @@ export default function AdminEventsPage() {
 
                         {/* Slug */}
                         <div className="space-y-2">
-                            <Label htmlFor="slug">Slug (URL) *</Label>
-                            <Input
-                                id="slug"
-                                value={formData.slug}
-                                onChange={(e) => updateFormField('slug', e.target.value)}
-                                placeholder="nombre-del-evento"
-                                required
-                            />
-                            <p className="text-xs text-muted-foreground">Se genera automáticamente del título</p>
+                            <Label htmlFor="slug">Enlace (URL pública)</Label>
+                            <div className="flex rounded-md border border-input bg-muted/50 focus-within:ring-1 focus-within:ring-ring">
+                                <span className="inline-flex items-center px-3 text-sm text-muted-foreground border-r border-input bg-muted rounded-l-md pointer-events-none">
+                                    /eventos/
+                                </span>
+                                <Input
+                                    id="slug"
+                                    value={formData.slug}
+                                    readOnly
+                                    disabled
+                                    className="border-0 focus-visible:ring-0 rounded-l-none bg-transparent opacity-100 placeholder:text-muted-foreground/70"
+                                    placeholder="nombre-del-evento"
+                                />
+                            </div>
+                            <p className="text-xs text-muted-foreground">Se genera automáticamente a partir del título. No se puede modificar manualmente para no romper enlaces existentes.</p>
                         </div>
 
                         {/* Category & Status row */}
