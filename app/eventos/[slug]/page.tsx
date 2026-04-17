@@ -73,6 +73,7 @@ export default function EventDetailPage() {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
+      timeZone: 'UTC',
     }).format(date);
   };
 
