@@ -55,6 +55,7 @@ export function EventsCarousel() {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
+      timeZone: 'UTC',
     }).format(date);
   };
 

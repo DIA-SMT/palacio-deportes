@@ -289,6 +289,7 @@ export default function AdminEventsPage() {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
+                timeZone: 'UTC',
             }).format(date);
         } catch {
             return dateISO;
@@ -707,13 +708,21 @@ export default function AdminEventsPage() {
                         {/* Price row */}
                         <div className="grid sm:grid-cols-2 gap-4 items-end">
                             <div className="space-y-2">
-                                <Label htmlFor="priceLabel">Etiqueta de precio *</Label>
+                                <Label htmlFor="priceLabel">Precio de la entrada *</Label>
                                 <Input
                                     id="priceLabel"
                                     value={formData.priceLabel}
-                                    onChange={(e) => updateFormField('priceLabel', e.target.value)}
-                                    placeholder="Ej: Desde $8.000 o Entrada libre"
-                                    required
+                                    onChange={(e) => {
+                                        const rawValue = e.target.value.replace(/\D/g, '');
+                                        if (!rawValue) {
+                                            updateFormField('priceLabel', '');
+                                        } else {
+                                            const number = parseInt(rawValue, 10);
+                                            updateFormField('priceLabel', `$ ${number.toLocaleString('es-AR')}`);
+                                        }
+                                    }}
+                                    placeholder="Ej: 8000"
+                                    required={!formData.isFree}
                                 />
                             </div>
                             <div className="flex items-center gap-3 pb-2">
