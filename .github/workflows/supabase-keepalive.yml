@@ -1,0 +1,35 @@
+name: Supabase Keepalive
+
+on:
+  schedule:
+    # Run twice a day to prevent the Free instance from being paused
+    - cron: '0 0,12 * * *'
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Keepalive RPC
+        run: |
+          echo "Sending keepalive ping to Supabase..."
+          
+          # We call the public.keepalive() wrapping the api.keepalive() function
+          RESPONSE=$(curl -s -w "%{http_code}" -X POST "${{ secrets.SUPABASE_PROJECT_URL }}/rest/v1/rpc/keepalive" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Content-Type: application/json")
+          
+          HTTP_BODY=${RESPONSE::-3}
+          HTTP_STATUS=$(echo -n $RESPONSE | tail -c 3)
+          
+          echo "HTTP Status: $HTTP_STATUS"
+          echo "Response Body: $HTTP_BODY"
+          
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Keepalive failed with HTTP $HTTP_STATUS"
+            exit 1
+          fi
+          
+          echo "Keepalive ping successful!"
