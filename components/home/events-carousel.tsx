@@ -18,9 +18,14 @@ export function EventsCarousel() {
   useEffect(() => {
     async function fetchEvents() {
       const allEvents = await getEvents();
+      const now = new Date();
       const upcoming = allEvents
-        .filter((event) => new Date(event.dateISO) >= new Date())
-        .sort((a, b) => new Date(a.dateISO).getTime() - new Date(b.dateISO).getTime())
+        .filter((event) => !event.dateISO || new Date(event.dateISO) >= now)
+        .sort((a, b) => {
+          if (!a.dateISO) return 1;
+          if (!b.dateISO) return -1;
+          return new Date(a.dateISO).getTime() - new Date(b.dateISO).getTime();
+        })
         .slice(0, 12);
       setUpcomingEvents(upcoming);
       setLoading(false);
@@ -49,7 +54,8 @@ export function EventsCarousel() {
     return variants[status as keyof typeof variants] || variants.disponible;
   };
 
-  const formatDate = (dateISO: string) => {
+  const formatDate = (dateISO: string | null) => {
+    if (!dateISO) return 'Fecha por confirmar';
     const date = new Date(dateISO);
     return new Intl.DateTimeFormat('es-AR', {
       day: 'numeric',

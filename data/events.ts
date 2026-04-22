@@ -9,8 +9,8 @@ export interface Event {
   slug: string;
   title: string;
   category: EventCategory;
-  dateISO: string;
-  time: string;
+  dateISO: string | null;
+  time: string | null;
   shortDescription: string;
   longDescription: string;
   image: string;
@@ -32,8 +32,8 @@ function mapRow(row: any): Event {
     slug: row.slug,
     title: row.title,
     category: row.category,
-    dateISO: row.date_iso,
-    time: row.time,
+    dateISO: row.date_iso ?? null,
+    time: row.time ?? null,
     shortDescription: row.short_description,
     longDescription: row.long_description,
     image: getStorageUrl(row.image ?? ''),
@@ -54,8 +54,8 @@ export function toDbRow(event: Partial<Event>) {
   if (event.slug !== undefined) row.slug = event.slug;
   if (event.title !== undefined) row.title = event.title;
   if (event.category !== undefined) row.category = event.category;
-  if (event.dateISO !== undefined) row.date_iso = event.dateISO;
-  if (event.time !== undefined) row.time = event.time;
+  if (event.dateISO !== undefined) row.date_iso = event.dateISO || null;
+  if (event.time !== undefined) row.time = event.time || null;
   if (event.shortDescription !== undefined) row.short_description = event.shortDescription;
   if (event.longDescription !== undefined) row.long_description = event.longDescription;
   if (event.image !== undefined) row.image = event.image;

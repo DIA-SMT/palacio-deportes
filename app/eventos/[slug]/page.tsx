@@ -66,7 +66,8 @@ export default function EventDetailPage() {
     return variants[status as keyof typeof variants] || variants.disponible;
   };
 
-  const formatDate = (dateISO: string) => {
+  const formatDate = (dateISO: string | null) => {
+    if (!dateISO) return 'Fecha por confirmar';
     const date = new Date(dateISO);
     return new Intl.DateTimeFormat('es-AR', {
       weekday: 'long',
