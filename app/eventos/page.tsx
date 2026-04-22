@@ -53,17 +53,26 @@ export default function EventosPage() {
 
       // Time filter
       if (timeFilter !== 'todos') {
-        const eventDate = new Date(event.dateISO);
-        eventDate.setHours(0, 0, 0, 0);
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
+        // Events without a date are treated as upcoming
+        if (!event.dateISO) {
+          if (timeFilter === 'anteriores') return false;
+        } else {
+          const eventDate = new Date(event.dateISO);
+          eventDate.setHours(0, 0, 0, 0);
+          const now = new Date();
+          now.setHours(0, 0, 0, 0);
 
-        if (timeFilter === 'anteriores' && eventDate >= now) return false;
-        if (timeFilter === 'proximos' && eventDate < now) return false;
+          if (timeFilter === 'anteriores' && eventDate >= now) return false;
+          if (timeFilter === 'proximos' && eventDate < now) return false;
+        }
       }
 
       return true;
-    }).sort((a, b) => new Date(a.dateISO).getTime() - new Date(b.dateISO).getTime());
+    }).sort((a, b) => {
+      if (!a.dateISO) return 1;
+      if (!b.dateISO) return -1;
+      return new Date(a.dateISO).getTime() - new Date(b.dateISO).getTime();
+    });
   }, [allEvents, searchQuery, categoryFilter, priceFilter, timeFilter]);
 
   const categories = [
@@ -85,7 +94,8 @@ export default function EventosPage() {
     return variants[status as keyof typeof variants] || variants.disponible;
   };
 
-  const formatDate = (dateISO: string) => {
+  const formatDate = (dateISO: string | null) => {
+    if (!dateISO) return 'Fecha por confirmar';
     const date = new Date(dateISO);
     return new Intl.DateTimeFormat('es-AR', {
       day: 'numeric',

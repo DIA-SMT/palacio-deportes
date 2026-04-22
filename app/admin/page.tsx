@@ -79,8 +79,8 @@ const emptyFormData = {
     title: '',
     slug: '',
     category: 'recital' as EventCategory,
-    dateISO: '',
-    time: '',
+    dateISO: '' as string | null,
+    time: '' as string | null,
     shortDescription: '',
     longDescription: '',
     image: '',
@@ -282,7 +282,8 @@ export default function AdminEventsPage() {
         }
     }
 
-    function formatDate(dateISO: string) {
+    function formatDate(dateISO: string | null) {
+        if (!dateISO) return 'Fecha por confirmar';
         try {
             const date = new Date(dateISO);
             return new Intl.DateTimeFormat('es-AR', {
@@ -564,23 +565,33 @@ export default function AdminEventsPage() {
                         {/* Date & Time row */}
                         <div className="grid sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="dateISO">Fecha *</Label>
+                                <Label htmlFor="dateISO">
+                                    Fecha{formData.status !== 'proximamente' ? ' *' : ''}
+                                    {formData.status === 'proximamente' && (
+                                        <span className="ml-1 text-xs text-muted-foreground">(opcional para Próximamente)</span>
+                                    )}
+                                </Label>
                                 <Input
                                     id="dateISO"
                                     type="date"
-                                    value={formData.dateISO}
+                                    value={formData.dateISO ?? ''}
                                     onChange={(e) => updateFormField('dateISO', e.target.value)}
-                                    required
+                                    required={formData.status !== 'proximamente'}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="time">Hora *</Label>
+                                <Label htmlFor="time">
+                                    Hora{formData.status !== 'proximamente' ? ' *' : ''}
+                                    {formData.status === 'proximamente' && (
+                                        <span className="ml-1 text-xs text-muted-foreground">(opcional)</span>
+                                    )}
+                                </Label>
                                 <Input
                                     id="time"
                                     type="time"
-                                    value={formData.time}
+                                    value={formData.time ?? ''}
                                     onChange={(e) => updateFormField('time', e.target.value)}
-                                    required
+                                    required={formData.status !== 'proximamente'}
                                 />
                             </div>
                         </div>
