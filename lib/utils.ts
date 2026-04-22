@@ -5,7 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function isPastEvent(dateISO: string) {
+export function isPastEvent(dateISO: string | null) {
+  if (!dateISO) return false;
   const eventDate = new Date(dateISO);
   eventDate.setHours(0, 0, 0, 0);
   const today = new Date();
