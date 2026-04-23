@@ -182,10 +182,12 @@ export default function EventDetailPage() {
                     <Calendar className="h-5 w-5" />
                     <span className="capitalize">{formatDate(event.dateISO)}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-5 w-5" />
-                    <span>{event.time} hs</span>
-                  </div>
+                  {event.time && (
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-5 w-5" />
+                      <span>{event.time} hs</span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2">
                     <MapPin className="h-5 w-5" />
                     <span>Palacio de los Deportes</span>
@@ -282,10 +284,12 @@ export default function EventDetailPage() {
 
                   <Separator />
 
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-2">Precio</div>
-                    <div className="text-2xl font-bold text-foreground">{event.priceLabel}</div>
-                  </div>
+                  {event.priceLabel && (
+                    <div>
+                      <div className="text-sm text-muted-foreground mb-2">Precio</div>
+                      <div className="text-2xl font-bold text-foreground">{event.priceLabel}</div>
+                    </div>
+                  )}
 
                   <Separator />
 

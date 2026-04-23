@@ -246,10 +246,12 @@ export default function EventosPage() {
                           <Calendar className="h-4 w-4" />
                           <span suppressHydrationWarning>{formatDate(event.dateISO)}</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="h-4 w-4" />
-                          <span>{event.time}hs</span>
-                        </div>
+                        {event.time && (
+                          <div className="flex items-center gap-1.5">
+                            <Clock className="h-4 w-4" />
+                            <span>{event.time}hs</span>
+                          </div>
+                        )}
                       </div>
                       <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2 group-hover:text-accent transition-colors">
                         <Link href={`/eventos/${event.slug}`} className="after:absolute after:inset-0 after:z-10">
@@ -265,7 +267,7 @@ export default function EventosPage() {
                         ) : (
                           <Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>
                         )}
-                        <span className="text-sm font-semibold text-foreground">{event.priceLabel}</span>
+                        {event.priceLabel && <span className="text-sm font-semibold text-foreground">{event.priceLabel}</span>}
                       </div>
                     </CardContent>
                     <CardFooter className="p-5 pt-0 flex gap-2 relative z-20">
