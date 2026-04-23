@@ -1,9 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Facebook, Instagram, Twitter, Youtube, Mail } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -55,25 +53,6 @@ export function Footer() {
             <p className="text-sm text-muted-foreground mb-6 max-w-sm">
               El mejor espacio para recitales, eventos culturales, transmisiones deportivas y entretenimiento en Tucumán.
             </p>
-
-            {/* Newsletter */}
-            <div className="mb-6">
-              <h3 className="text-sm font-semibold text-foreground mb-3">
-                Recibí novedades
-              </h3>
-              <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
-                <Input
-                  type="email"
-                  placeholder="Tu email"
-                  className="flex-1"
-                  aria-label="Email para newsletter"
-                />
-                <Button type="submit" size="icon" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                  <Mail className="h-4 w-4" />
-                  <span className="sr-only">Suscribirse</span>
-                </Button>
-              </form>
-            </div>
 
             {/* Social Links */}
             <div className="flex gap-3">
