@@ -49,7 +49,7 @@ export function EventsCarousel() {
       disponible: { label: 'Disponible', variant: 'default' as const },
       ultimos: { label: 'Últimos lugares', variant: 'destructive' as const },
       agotado: { label: 'Agotado', variant: 'secondary' as const },
-      proximamente: { label: 'Próximamente', variant: 'outline' as const },
+      proximamente: { label: 'Próximamente', variant: 'outline' as const, className: 'border-amber-400 text-amber-400 bg-amber-400/10' },
     };
     return variants[status as keyof typeof variants] || variants.disponible;
   };
@@ -145,7 +145,7 @@ export function EventsCarousel() {
                           {event.shortDescription}
                         </p>
                         <div className="flex items-center justify-between">
-                          <Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>
+                          <Badge variant={statusBadge.variant} className={statusBadge.className}>{statusBadge.label}</Badge>
                           {event.priceLabel && <span className="text-sm font-semibold text-foreground">{event.priceLabel}</span>}
                         </div>
                       </CardContent>

@@ -725,7 +725,12 @@ export default function AdminEventsPage() {
                         {/* Price row */}
                         <div className="grid sm:grid-cols-2 gap-4 items-end">
                             <div className="space-y-2">
-                                <Label htmlFor="priceLabel">Precio de la entrada *</Label>
+                                <Label htmlFor="priceLabel">
+                                    Precio de la entrada{formData.status !== 'proximamente' && !formData.isFree ? ' *' : ''}
+                                    {formData.status === 'proximamente' && (
+                                        <span className="ml-1 text-xs text-muted-foreground">(opcional)</span>
+                                    )}
+                                </Label>
                                 <Input
                                     id="priceLabel"
                                     value={formData.priceLabel}
@@ -739,7 +744,7 @@ export default function AdminEventsPage() {
                                         }
                                     }}
                                     placeholder="Ej: 8000"
-                                    required={!formData.isFree}
+                                    required={!formData.isFree && formData.status !== 'proximamente'}
                                 />
                             </div>
                             <div className="flex items-center gap-3 pb-2">
