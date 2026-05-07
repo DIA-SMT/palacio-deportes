@@ -5,7 +5,12 @@ import { Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube, Briefcase }
 
 const socialLinks = [
   { name: 'Facebook', icon: Facebook, href: 'https://facebook.com', color: 'hover:text-blue-500' },
-  { name: 'Instagram', icon: Instagram, href: 'https://instagram.com', color: 'hover:text-pink-500' },
+  {
+    name: 'Instagram',
+    icon: Instagram,
+    href: 'https://www.instagram.com/palaciodelosdeportes_smt/',
+    color: 'hover:text-pink-500',
+  },
   { name: 'Twitter', icon: Twitter, href: 'https://twitter.com', color: 'hover:text-blue-400' },
   { name: 'YouTube', icon: Youtube, href: 'https://youtube.com', color: 'hover:text-red-500' },
 ];
