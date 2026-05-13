@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Ticket } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { ModeToggle } from '@/components/mode-toggle';
 
@@ -63,12 +63,6 @@ export function Header() {
           {/* CTA Button */}
           <div className="hidden md:flex items-center gap-4">
             <ModeToggle />
-            <Button asChild className="bg-accent hover:bg-accent/90 text-accent-foreground">
-              <Link href="http://ticketweb.com.ar/" target="_blank" rel="noopener noreferrer">
-                <Ticket className="mr-2 h-4 w-4" />
-                Comprar Entradas
-              </Link>
-            </Button>
           </div>
 
           {/* Mobile Menu */}
@@ -100,12 +94,6 @@ export function Header() {
                     </Link>
                   ))}
                 </nav>
-                <Button asChild className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-                  <Link href="http://ticketweb.com.ar/" target="_blank" rel="noopener noreferrer">
-                    <Ticket className="mr-2 h-4 w-4" />
-                    Comprar Entradas
-                  </Link>
-                </Button>
               </div>
             </SheetContent>
           </Sheet>
