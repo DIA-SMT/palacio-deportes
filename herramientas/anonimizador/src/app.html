@@ -1,0 +1,1016 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bloquea toda conexión de red: el documento nunca sale de esta computadora. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; connect-src 'none'; worker-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Anonimizador de escritos</title>
+<style>
+:root{
+  --bg:#f6f5f2; --panel:#ffffff; --ink:#1d1c1a; --muted:#6b6862; --line:#e3e0da; --accent:#1f4e79; --accent-ink:#fff;
+  --ok:#1e7a46; --warn-bg:#fff4db; --warn-ink:#7a5200;
+  --c-PERSONA:#d7e6fb; --k-PERSONA:#1b4f93;
+  --c-DNI:#eadcfb; --k-DNI:#5b2a93;
+  --c-CUIL:#e4e0fb; --k-CUIL:#3e3593;
+  --c-CUIT:#e4e0fb; --k-CUIT:#3e3593;
+  --c-DOMICILIO:#d5f1de; --k-DOMICILIO:#1b6a38;
+  --c-TELEFONO:#fde3cc; --k-TELEFONO:#8a4300;
+  --c-EMAIL:#cfeff0; --k-EMAIL:#0e6468;
+  --c-SALUD:#fbd9de; --k-SALUD:#9a1f35;
+  --c-OTRO:#e6e4df; --k-OTRO:#45423d;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#161614; --panel:#1f1f1c; --ink:#ecebe7; --muted:#a19d95; --line:#34332f; --accent:#7fb0e6; --accent-ink:#0d1b2a;
+    --ok:#6fd199; --warn-bg:#3a2f14; --warn-ink:#f3cf7a;
+    --c-PERSONA:#1f3a5f; --k-PERSONA:#a9cbf7;
+    --c-DNI:#3b2a55; --k-DNI:#d5b9f7;
+    --c-CUIL:#312d57; --k-CUIL:#c2bbf7;
+    --c-CUIT:#312d57; --k-CUIT:#c2bbf7;
+    --c-DOMICILIO:#1c4430; --k-DOMICILIO:#9fe0b6;
+    --c-TELEFONO:#4a2f17; --k-TELEFONO:#f7c290;
+    --c-EMAIL:#16403f; --k-EMAIL:#93e0e2;
+    --c-SALUD:#521f2a; --k-SALUD:#f7a9b6;
+    --c-OTRO:#3a3935; --k-OTRO:#d9d6cf;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161614; --panel:#1f1f1c; --ink:#ecebe7; --muted:#a19d95; --line:#34332f; --accent:#7fb0e6; --accent-ink:#0d1b2a;
+  --ok:#6fd199; --warn-bg:#3a2f14; --warn-ink:#f3cf7a;
+  --c-PERSONA:#1f3a5f; --k-PERSONA:#a9cbf7;
+  --c-DNI:#3b2a55; --k-DNI:#d5b9f7;
+  --c-CUIL:#312d57; --k-CUIL:#c2bbf7;
+  --c-CUIT:#312d57; --k-CUIT:#c2bbf7;
+  --c-DOMICILIO:#1c4430; --k-DOMICILIO:#9fe0b6;
+  --c-TELEFONO:#4a2f17; --k-TELEFONO:#f7c290;
+  --c-EMAIL:#16403f; --k-EMAIL:#93e0e2;
+  --c-SALUD:#521f2a; --k-SALUD:#f7a9b6;
+  --c-OTRO:#3a3935; --k-OTRO:#d9d6cf;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+button,select,input{font:inherit;color:inherit}
+.wrap{max-width:1500px;margin:0 auto;padding:20px 16px 40px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
+h1{font-family:Georgia,"Times New Roman",serif;font-weight:600;font-size:26px;margin:0;letter-spacing:.2px}
+.sub{color:var(--muted);margin:2px 0 0}
+.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--ok)}
+.badge svg{flex:none}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px}
+#drop{padding:40px 20px;text-align:center;border:2px dashed var(--line);border-radius:12px;background:var(--panel);cursor:pointer;transition:border-color .15s,background .15s}
+#drop.over{border-color:var(--accent)}
+#drop h2{margin:8px 0 4px;font-size:18px}
+#drop p{margin:0;color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 12px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.link{background:none;border:0;color:var(--accent);cursor:pointer;padding:0;text-decoration:underline}
+#pasteBox{margin-top:12px;display:none}
+#pasteBox textarea{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:10px;font:14px/1.5 Georgia,serif;color:var(--ink)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 12px;margin:14px 0 10px}
+.toolbar .grow{flex:1}
+.file{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:320px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:13px;border:1px solid transparent;cursor:pointer;user-select:none}
+.chip input{margin:0}
+.chip.off{opacity:.45;text-decoration:line-through}
+.opts{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.opts label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.notice{padding:10px 12px;border-radius:8px;background:var(--warn-bg);color:var(--warn-ink);font-size:14px;margin:0 0 10px}
+.stats{font-size:14px;color:var(--muted);margin:0 0 8px}
+.panes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pane{display:flex;flex-direction:column;min-width:0}
+.pane h3{margin:0;padding:8px 14px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}
+.doc{height:calc(100vh - 260px);min-height:360px;overflow:auto;padding:16px 20px;white-space:pre-wrap;word-wrap:break-word;font:15px/1.65 Georgia,"Times New Roman",serif}
+mark{border-radius:3px;padding:0 2px;color:inherit;cursor:pointer;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.doc mark.m{white-space:nowrap;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:.86em;font-weight:600;padding:1px 4px}
+mark.hl{outline:2px solid var(--ink)}
+#tip{position:fixed;z-index:10;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:4px 8px;border-radius:6px;display:none;max-width:360px}
+#selBar{position:fixed;z-index:11;display:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:6px;gap:4px;align-items:center;font-size:13px}
+#selBar span{padding:0 6px;color:var(--muted)}
+#selBar button{border:0;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:13px}
+section.ents{margin-top:16px;padding:14px}
+section.ents h2{margin:0 0 4px;font-size:17px}
+section.ents .hint{color:var(--muted);font-size:13px;margin:0 0 10px}
+.addrow{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.addrow input{flex:1;min-width:200px;border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:var(--bg)}
+.addrow select{border:1px solid var(--line);border-radius:8px;padding:7px 8px;background:var(--bg)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--line);padding:6px 8px}
+.tbl td{border-bottom:1px solid var(--line);padding:6px 8px;vertical-align:top}
+.tbl tr.off td{opacity:.45}
+.tbl tr.off td .orig{text-decoration:line-through}
+.tbl tr.flash{animation:flash 1.2s}
+@keyframes flash{from{background:var(--c-OTRO)}to{background:transparent}}
+.tag{display:inline-block;border-radius:4px;padding:0 6px;font-weight:600;font-size:13px;white-space:nowrap}
+.orig{word-break:break-word}
+.x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1}
+.tblwrap{max-height:420px;overflow:auto}
+footer{color:var(--muted);font-size:12px;margin-top:18px}
+#app{display:none}
+#busy{display:none;margin-top:12px;color:var(--muted)}
+@media (max-width:860px){
+  .panes{grid-template-columns:1fr}
+  .doc{height:55vh}
+  .file{max-width:100%}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Anonimizador de escritos</h1>
+      <p class="sub">Reemplaza nombres, DNI, CUIL/CUIT, domicilios, teléfonos, correos y datos de salud por marcadores.</p>
+    </div>
+    <div class="badge" title="La página tiene bloqueadas todas las conexiones de red (Content-Security-Policy). El PDF se procesa en su navegador.">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      100 % local · sin conexión a servidores
+    </div>
+  </header>
+
+  <div id="start">
+    <div id="drop" tabindex="0" role="button" aria-label="Elegir archivo PDF">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 12v6M9 15l3-3 3 3"/></svg>
+      <h2>Arrastrá el escrito en PDF o hacé clic para elegirlo</h2>
+      <p>También acepta archivos .txt. El documento no sale de esta computadora.</p>
+      <input id="file" type="file" accept="application/pdf,.pdf,.txt,text/plain" hidden>
+    </div>
+    <p style="margin:10px 2px 0;font-size:14px;color:var(--muted)">¿El texto no está en PDF? <button class="link" id="pasteToggle">Pegalo acá</button>.</p>
+    <div id="pasteBox">
+      <textarea id="pasteArea" placeholder="Pegá el texto del escrito…"></textarea>
+      <div style="margin-top:8px"><button class="btn primary" id="pasteGo">Anonimizar texto</button></div>
+    </div>
+    <div id="busy">Leyendo el PDF…</div>
+  </div>
+
+  <div id="app">
+    <div class="card toolbar">
+      <span class="file" id="fileName"></span>
+      <button class="btn" id="another">Cargar otro</button>
+      <span class="grow"></span>
+      <button class="btn" id="copyBtn">Copiar</button>
+      <button class="btn" id="csvBtn" title="Tabla con la correspondencia marcador → dato real. Contiene los datos personales: guárdela con cuidado.">Tabla de equivalencias</button>
+      <button class="btn primary" id="dlBtn">Descargar anonimizado (.txt)</button>
+    </div>
+    <div class="card toolbar" style="margin-top:0">
+      <div class="chips" id="chips"></div>
+      <span class="grow"></span>
+      <div class="opts">
+        <label><input type="checkbox" id="optJoin" checked> Unir líneas del mismo párrafo</label>
+        <label><input type="checkbox" id="optSync" checked> Desplazamiento sincronizado</label>
+      </div>
+    </div>
+    <div id="notice"></div>
+    <p class="stats" id="stats"></p>
+    <div class="panes">
+      <div class="pane card"><h3><span>Original</span><span style="text-transform:none;letter-spacing:0">Seleccioná texto para anonimizarlo a mano</span></h3><div class="doc" id="left"></div></div>
+      <div class="pane card"><h3><span>Anonimizado</span></h3><div class="doc" id="right"></div></div>
+    </div>
+
+    <section class="card ents">
+      <h2>Datos detectados</h2>
+      <p class="hint">Destildá lo que no deba anonimizarse (falsos positivos). Si falta algo, agregalo abajo o seleccionalo en el texto original. La detección es automática: revisá siempre el resultado antes de usarlo.</p>
+      <div class="addrow">
+        <input id="addText" placeholder="Texto a anonimizar (ej.: un apodo, una matrícula, el nombre de un hospital)">
+        <select id="addCat"></select>
+        <button class="btn" id="addBtn">Agregar</button>
+      </div>
+      <div class="tblwrap">
+        <table class="tbl">
+          <thead><tr><th style="width:36px"></th><th>Marcador</th><th>Dato original</th><th style="width:90px">Veces</th><th style="width:30px"></th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <footer>Extracción de texto con PDF.js (Mozilla, licencia Apache 2.0), incluido dentro de este archivo. No requiere internet. Los PDF escaneados (imágenes) no contienen texto y no pueden procesarse sin OCR.</footer>
+</div>
+
+<div id="tip"></div>
+<div id="selBar"></div>
+
+<!--PDFJS_WORKER-->
+<!--PDFJS_LIB-->
+
+<script>
+"use strict";
+/* ============================================================
+   Categorías
+   ============================================================ */
+const CATS = {
+  PERSONA:  {label:"PERSONA",   name:"Personas",   prio:3},
+  DNI:      {label:"DNI",       name:"DNI",        prio:6},
+  CUIL:     {label:"CUIL",      name:"CUIL",       prio:7},
+  CUIT:     {label:"CUIT",      name:"CUIT",       prio:7},
+  DOMICILIO:{label:"DOMICILIO", name:"Domicilios", prio:4},
+  TELEFONO: {label:"TELÉFONO",  name:"Teléfonos",  prio:5},
+  EMAIL:    {label:"EMAIL",     name:"Correos",    prio:8},
+  SALUD:    {label:"SALUD",     name:"Salud",      prio:2},
+  OTRO:     {label:"DATO",      name:"Otros",      prio:1},
+};
+// Grupos que el usuario puede activar/desactivar
+const GROUPS = [
+  {id:"PERSONA", cats:["PERSONA"], name:"Personas"},
+  {id:"DNI", cats:["DNI"], name:"DNI"},
+  {id:"CUIT", cats:["CUIL","CUIT"], name:"CUIL / CUIT"},
+  {id:"DOMICILIO", cats:["DOMICILIO"], name:"Domicilios"},
+  {id:"TELEFONO", cats:["TELEFONO"], name:"Teléfonos"},
+  {id:"EMAIL", cats:["EMAIL"], name:"Correos"},
+  {id:"SALUD", cats:["SALUD"], name:"Salud"},
+];
+
+/* ============================================================
+   Utilidades de texto
+   ============================================================ */
+function foldChar(c){
+  const f = c.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+  return f.length === 1 ? f : (c.toLowerCase().length === 1 ? c.toLowerCase() : c);
+}
+// Plegado que conserva la longitud (mismos índices que el original)
+function foldKeep(s){
+  let out = "";
+  for (const ch of s){
+    const f = foldChar(ch);
+    out += f.length === ch.length ? f : ch;
+  }
+  return out;
+}
+function fold(s){ return s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/\s+/g," ").trim(); }
+function esc(s){ return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+function reEsc(s){ return s.replace(/[.*+?^${}()|[\]\\\/]/g,"\\$&"); }
+function digits(s){ return s.replace(/\D/g,""); }
+
+/* ============================================================
+   Palabras que nunca son nombres de persona
+   ============================================================ */
+const STOP = new Set((`
+que el la los las lo un una unos unas por para en con del al se su sus mi mis tu y o u a e de ni no si
+este esta estos estas ese esa esos esas aquel dicho dicha dichos dichas tal todo toda todos todas otro otra otros otras
+vengo venimos soy yo nos asimismo atento conforme segun sin sobre ante bajo desde hasta entre hacia cuando como donde
+cual cuales quien quienes cuyo cuya ya mas menos muy tambien luego pues porque aunque sino
+dia dias ano anos mes meses fecha hora horas hoy
+enero febrero marzo abril mayo junio julio agosto septiembre setiembre octubre noviembre diciembre
+lunes martes miercoles jueves viernes sabado domingo
+sr sra srta senor senora senorita don dona dr dra doctor doctora lic ing cr cra esc prof
+juez jueza juzgado tribunal tribunales camara excma excmo exma exmo sala secretaria secretario actuario actuaria
+fiscal fiscalia defensor defensora defensoria asesor asesora asesoria ministerio publico pupilar corte suprema
+justicia poder judicial magistrado magistrada vocal vocales presidente presidenta camarista oficial
+codigo civil comercial penal procesal ley leyes decreto resolucion acordada articulo art arts inc inciso
+constitucion nacional nacion provincial provincia estado municipalidad municipal gobierno superior republica
+oficina documento expediente expte autos causa demanda demandado demandada actor actora codemandado
+objeto hechos hecho derecho derechos prueba pruebas documental testimonial pericial informativa confesional
+petitorio solicita solicito solicitamos promueve promuevo contesta contesto apela apelo recurso reserva caso
+cuestion honorarios costas intereses rubros rubro dano danos perjuicios moral lucro cesante emergente
+incapacidad sobreseimiento sentencia audiencia mediacion pericia perito informe informes liquidacion
+seguro seguros aseguradora compania cia sociedad banco empresa sa srl sas sau obra social anses afip arca pami
+hospital sanatorio clinica centro medico medica policia comisaria unidad regional
+abogado abogada abogados letrado letrada apoderado apoderada patrocinante patrocinio matricula mat tomo folio colegio
+dni cuil cuit le lc nro numero calle avenida av avda barrio ciudad domicilio tel telefono email correo whatsapp celular
+nota anexo capitulo punto primero segundo tercero cuarto quinto sexto i ii iii iv v vi vii viii ix x xi xii bis
+fs fojas cfr conf ssa vs us ud uds dios guarde proveer sera otrosi digo
+mayor menor edad argentino argentina argentinos nacionalidad casado casada soltero soltera viudo viuda divorciado divorciada
+profesion empleado empleada jubilado jubilada fallecido fallecida hijo hija hijos padre madre padres
+san santa santo tucuman salta jujuy catamarca estero fe buenos aires capital
+federal caba conurbano misiones corrientes chaco formosa neuquen rio negro chubut tierra fuego pampa
+`).trim().split(/\s+/));
+
+/* ============================================================
+   Expresiones regulares base
+   ============================================================ */
+const U = "A-ZÁÉÍÓÚÑÜ", L = "a-záéíóúñü";
+const SP = String.raw`(?:[ \t]+\n?[ \t]*|\n[ \t]*)`;          // espacio, admite un salto de línea
+const TOK = String.raw`(?:[${U}][${L}]+(?:-[${U}][${L}]+)?|[${U}]{2,}(?:-[${U}]{2,})?|[${U}]\.)`;
+const CONN = String.raw`(?:de|del|DE|DEL|De|Del)(?:${SP}(?:la|los|las|LA|LOS|LAS))?`;
+const NAME = String.raw`${TOK}(?:${SP}(?:${CONN}${SP})?${TOK}){0,5}`;
+const NAME_C = String.raw`[${U}]{2,}(?:${SP}(?:${CONN}${SP})?[${U}]{2,}){0,2},${SP}${NAME}`; // "PÉREZ, Juan Carlos"
+const ORG_WORDS = /(?<![\wáéíóúñ])(?:Sociedad|Cooperativa|Municipalidad|Provincia|Estado|Naci[oó]n|Banco|Seguros?|Aseguradora|Compa[ñn][ií]a|C[ií]a\.|Gobierno|Asociaci[oó]n|Fundaci[oó]n|Club|Sindicato|Obra\s+Social|Instituto|Ministerio|Fisco|Consorcio|Hospital|Sanatorio|Cl[ií]nica|Universidad|Colegio|Empresa|Transportes?|Ltda)(?![\wáéíóúñ])/i;
+const ORG_ABBR = /(?<![\w.])(?:S\.?\s?A\.?(?:\s?U\.?)?|S\.?\s?R\.?\s?L\.?|S\.?\s?A\.?\s?S\.?|S\.?\s?C\.?\s?A\.?|A\.?R\.?T\.?|AFIP|ARCA|ANSES|PAMI|OSDE)(?![\w])/;
+const ORG_RE = {test: s => ORG_WORDS.test(s) || ORG_ABBR.test(s)};
+
+/* ---------- Nombres: limpieza de candidatos ---------- */
+function tokensOf(text, base){
+  const out = []; const re = /[^\s,]+/g; let m;
+  while ((m = re.exec(text))){
+    const raw = m[0]; const f = fold(raw).replace(/\.$/,"");
+    out.push({s: base + m.index, e: base + m.index + raw.length, raw, f,
+      conn: /^(de|del|la|los|las)$/.test(f), initial: /^[A-ZÁÉÍÓÚÑÜ]\.$/.test(raw)});
+  }
+  return out;
+}
+function isStopTok(t){ return !t.conn && !t.initial && STOP.has(t.f); }
+// Recorta el candidato quedándose con el tramo de tokens válidos pegado al ancla ("left" o "right")
+function cleanName(text, s, e, anchor, minTok){
+  let toks = tokensOf(text.slice(s, e), s);
+  if (!toks.length) return null;
+  const keep = [];
+  if (anchor === "right"){
+    for (let i = toks.length - 1; i >= 0; i--){
+      const t = toks[i];
+      if (isStopTok(t)) { if (keep.length) break; else return null; }
+      keep.unshift(t);
+    }
+  } else {
+    for (let i = 0; i < toks.length; i++){
+      const t = toks[i];
+      if (isStopTok(t)) break;
+      keep.push(t);
+    }
+  }
+  while (keep.length && keep[0].conn) keep.shift();
+  while (keep.length && keep[keep.length-1].conn) keep.pop();
+  while (keep.length && keep[0].initial) keep.shift();
+  const real = keep.filter(t => !t.conn && !t.initial);
+  if (real.length < minTok) return null;
+  if (real.some(t => t.f.length < 2)) return null;
+  return {s: keep[0].s, e: keep[keep.length-1].e, toks: keep};
+}
+
+/* ============================================================
+   Detección de personas
+   ============================================================ */
+function detectPersonCandidates(text){
+  const dets = [];
+  const push = (c, surnameFirst) => {
+    if (!c || ORG_WORDS.test(text.slice(c.s, c.e)) || ORG_ABBR.test(text.slice(c.s, c.e + 10))) return;   // empresas y organismos no son personas
+    dets.push({...c, text: text.slice(c.s, c.e), surnameFirst});
+  };
+
+  // 1) Tratamientos: Sr., Sra., Dr., Dra., don, doña, señor/a…
+  const reHon = new RegExp(String.raw`(?:\b(?:[Ss]r|[Ss]ra|[Ss]rta|[Dd]r|[Dd]ra|[Ll]ic|[Ii]ng|[Cc]r|[Cc]ra|[Ee]sc|SR|SRA|SRTA|DR|DRA|LIC|ING)\.|(?<![\w${L}${U}])(?:[Ss]eñor(?:a|ita)?|SEÑOR(?:A|ITA)?|[Dd]on|[Dd]oña|DON|DOÑA|[Dd]octor(?:a)?|DOCTOR(?:A)?))[ \t]*\n?[ \t]*(${NAME_C}|${NAME})`, "g");
+  for (const m of text.matchAll(reHon)){
+    const s = m.index + m[0].length - m[1].length;
+    const isC = m[1].includes(",");
+    push(cleanName(text, s, s + m[1].length, "left", 1), isC);
+  }
+
+  // 2) Roles procesales seguidos de un nombre
+  const reRole = new RegExp(String.raw`(?<![\w${L}])(?:[Aa]ctor(?:a)?|ACTOR(?:A)?|[Dd]emandad[oa]|DEMANDAD[OA]|[Cc]odemandad[oa]|[Cc]ausante|[Tt]estigo|[Ii]mputad[oa]|IMPUTAD[OA]|[Vv][ií]ctima|[Dd]amnificad[oa]|[Tt]rabajador(?:a)?|[Cc][oó]nyuge|[Ee]spos[oa]|[Hh]ij[oa]|[Pp]rogenitor(?:a)?|[Pp]adre|[Mm]adre|[Mm]enor|[Nn]iñ[oa]|[Aa]dolescente|[Mm]i\s+(?:mandante|poderdante|cliente|representad[oa]|patrocinad[oa])|[Cc]onductor(?:a)?|[Pp]ropietari[oa]|[Ll]ocatari[oa]|[Ll]ocador(?:a)?|[Hh]ereder[oa]s?|[Ff]allecid[oa]|[Pp]aciente|[Ee]mpleador(?:a)?|[Rr]equirente|[Rr]equerid[oa]|[Dd]enunciante|[Dd]enunciad[oa]|[Ii]mputad[oa]|[Ss]olicitante)\s*[:,]?\s*(?:(?:el|la)\s+)?(${NAME_C}|${NAME})`, "g");
+  for (const m of text.matchAll(reRole)){
+    const s = m.index + m[0].length - m[1].length;
+    push(cleanName(text, s, s + m[1].length, "left", 2), m[1].includes(","));
+  }
+
+  // 3) Nombre seguido de datos de identificación (", DNI…", ", argentino…", ", mayor de edad…")
+  const reId = new RegExp(String.raw`(${NAME_C}|${NAME})(?=\s*,?\s*(?:\(\s*\d{1,3}\s*años|quien\s+acredita|D\.?\s?N\.?\s?I|L\.?\s?E\.\s|L\.?\s?C\.\s|C\.?\s?U\.?\s?I\.?\s?[LT]|[Dd]ocumento|DOCUMENTO|[Aa]rgentin[oa]|ARGENTIN[OA]|[Uu]ruguay[oa]|[Pp]araguay[oa]|[Bb]olivian[oa]|[Pp]eruan[oa]|[Cc]hilen[oa]|[Vv]enezolan[oa]|de\s+nacionalidad|mayor\s+de\s+edad|nacid[oa]|con\s+domicilio|domiciliad[oa]|de\s+profesi[oó]n|de\s+estado\s+civil|solter[oa]|casad[oa]|viud[oa]|divorciad[oa]|de\s+\d{1,3}\s+años|Mat(?:r[ií]cula|\.)|M\.P\.|T°|Tomo))`, "g");
+  for (const m of text.matchAll(reId)){
+    push(cleanName(text, m.index, m.index + m[1].length, "right", 2), m[1].includes(","));
+  }
+
+  // 4) Carátula: "PÉREZ, Juan c/ GÓMEZ, María s/ daños y perjuicios"
+  const reCar = /([^\n“”"«»:]{2,120}?)\s+[cC]\s?\/\s?([^\n“”"«»]{2,120}?)\s+[sS]\s?\/(?!\s?[nN]\b)/g;
+  for (const m of text.matchAll(reCar)){
+    const leftS = m.index, rightS = m.index + m[0].indexOf(m[2], m[1].length);
+    const parts = [[m[1], leftS, "last"], [m[2], rightS, "first"]];
+    for (const [chunk, base, which] of parts){
+      const segs = splitParty(chunk);
+      for (const sg of segs){
+        if (ORG_RE.test(sg.t)) continue;
+        const re = new RegExp(String.raw`${NAME_C}|${NAME}`, "g");
+        const found = [...sg.t.matchAll(re)];
+        if (!found.length) continue;
+        const mm = which === "last" ? found[found.length-1] : found[0];
+        const s = base + sg.off + mm.index;
+        const c = cleanName(text, s, s + mm[0].length, which === "last" ? "right" : "left", 1);
+        if (c){
+          const t = text.slice(c.s, c.e);
+          // En carátulas en mayúsculas sin coma, el apellido suele ir primero
+          push(c, t.includes(",") || t === t.toUpperCase());
+        }
+      }
+    }
+  }
+  return dets;
+}
+function splitParty(chunk){
+  const out = []; const re = /\s+(?:y|Y)\s+(?:otr[oa]s?|OTR[OA]S?)\b|\s+(?:y|Y|e|E)\s+/g;
+  let last = 0, m;
+  while ((m = re.exec(chunk))){ out.push({t: chunk.slice(last, m.index), off: last}); last = m.index + m[0].length; }
+  out.push({t: chunk.slice(last), off: last});
+  return out.filter(x => x.t.trim());
+}
+
+/* Agrupa las detecciones en personas y genera todas las variantes a buscar */
+function buildPersons(dets){
+  const ents = []; // {tokens:Set, surnames:Set, given:[], surn:[], forms:Set}
+  const multi = [], single = [];
+  for (const d of dets){
+    const real = d.toks.filter(t => !t.conn && !t.initial);
+    const f = real.map(t => t.f);
+    let surn = [], given = [];
+    if (d.text.includes(",")){
+      const ci = d.text.indexOf(",") + (d.s);
+      surn = real.filter(t => t.s < ci).map(t => t.f);
+      given = real.filter(t => t.s > ci).map(t => t.f);
+    } else if (real.length === 1){
+      surn = [f[0]];
+    } else {
+      const caps = real.filter(t => t.raw.length > 1 && t.raw === t.raw.toUpperCase());
+      if (caps.length && caps.length < real.length){
+        surn = caps.map(t => t.f); given = real.filter(t => !caps.includes(t)).map(t => t.f);
+      } else if (d.surnameFirst){
+        surn = [f[0]]; given = f.slice(1);
+      } else {
+        surn = [f[f.length-1]]; given = f.slice(0, -1);
+      }
+    }
+    (real.length > 1 ? multi : single).push({f, surn, given});
+  }
+  multi.sort((a,b) => b.f.length - a.f.length);
+  for (const d of multi){
+    const T = new Set(d.f);
+    let target = null;
+    for (const e of ents){
+      const sub = [...T].every(x => e.tokens.has(x)) || [...e.tokens].every(x => T.has(x));
+      const shareSurname = d.surn.some(x => e.tokens.has(x)) || [...e.surnames].some(x => T.has(x));
+      if (sub && shareSurname){ target = e; break; }
+    }
+    if (!target){ target = {tokens:new Set(), surnames:new Set(), given:[], surn:[], forms:new Set()}; ents.push(target); }
+    d.f.forEach(x => target.tokens.add(x));
+    d.surn.forEach(x => target.surnames.add(x));
+    if (d.given.length > target.given.length) target.given = d.given;
+    if (d.surn.length > target.surn.length) target.surn = d.surn;
+    target.forms.add(d.f.join(" "));
+  }
+  for (const d of single){
+    const w = d.f[0];
+    const owners = ents.filter(e => e.tokens.has(w));
+    if (owners.length) continue; // ya se cubre con las variantes de esa persona
+    ents.push({tokens:new Set([w]), surnames:new Set([w]), given:[], surn:[w], forms:new Set([w]), single:true});
+  }
+  // Variantes
+  const surnameOwners = {};
+  for (const e of ents) for (const s of e.surnames) (surnameOwners[s] = surnameOwners[s] || new Set()).add(e);
+  const out = []; // {entKey, variants:[[tok,...]]}
+  const ambiguous = new Set();
+  ents.forEach((e, i) => {
+    const V = new Map();
+    const add = arr => { if (arr.length) V.set(arr.join(" "), arr); };
+    for (const f of e.forms) add(f.split(" "));
+    if (e.given.length && e.surn.length){
+      add([...e.given, ...e.surn]); add([...e.surn, ...e.given]);
+      add([e.given[0], ...e.surn]); add([...e.surn, e.given[0]]);
+      if (e.surn.length > 1){ add([e.given[0], e.surn[0]]); add([...e.given, e.surn[0]]); }
+    }
+    for (const s of e.surnames){
+      if (s.length < 3 || STOP.has(s)) continue;
+      if (surnameOwners[s].size === 1) add([s]); else ambiguous.add(s);
+    }
+    out.push({key: "p" + i, label: [...e.forms].sort((a,b)=>b.length-a.length)[0], variants: [...V.values()]});
+  });
+  for (const s of ambiguous) out.push({key: "amb:" + s, label: s, variants: [[s]]});
+  return out;
+}
+
+function detectPersons(text, ftext){
+  const dets = detectPersonCandidates(text);
+  const persons = buildPersons(dets);
+  const spans = [];
+  for (const p of persons){
+    for (const v of p.variants){
+      const pat = v.map(reEsc).join(String.raw`(?:\s*,\s*|\s+)(?:(?:de|del|la|los|las)\s+)*`);
+      const re = new RegExp(String.raw`(?<![a-z0-9ñ])${pat}(?![a-z0-9ñ])`, "g");
+      for (const m of ftext.matchAll(re)){
+        const s = m.index, e = s + m[0].length;
+        // Una sola palabra: sólo si en el original empieza con mayúscula
+        if (v.length === 1 && !/^[A-ZÁÉÍÓÚÑÜ]/.test(text[s])) continue;
+        spans.push({s, e, cat:"PERSONA", key:p.key, label:p.label});
+      }
+    }
+  }
+  return spans;
+}
+
+/* ============================================================
+   DNI, CUIL/CUIT, teléfonos, correos
+   ============================================================ */
+function detectDNI(text){
+  const spans = [], nums = new Set();
+  const re = /(?:\bD\.?\s?N\.?\s?I\.?|\bL\.?\s?E\.|\bL\.?\s?C\.|\b[Dd]ocumento(?:\s+[Nn]acional\s+de\s+[Ii]dentidad)?|\bDOCUMENTO(?:\s+NACIONAL\s+DE\s+IDENTIDAD)?)\s*(?:[Nn]\.?\s?[°º]\.?|[Nn]ro\.?|[Nn]úmero|[Nn]o\.|#)?\s*:?\s*(\d{1,2}(?:[.\s]\d{3}){2}|\d{7,8})(?!\d)/g;
+  for (const m of text.matchAll(re)){
+    nums.add(digits(m[1]));
+  }
+  // Todas las apariciones del mismo número, con o sin puntos
+  for (const n of nums){
+    const d = n.length === 8 ? [n.slice(0,2), n.slice(2,5), n.slice(5)] : [n.slice(0,1), n.slice(1,4), n.slice(4)];
+    const re2 = new RegExp(String.raw`(?<![\d.])(?:${d.join(String.raw`[.\s]?`)})(?![\d])`, "g");
+    for (const m of text.matchAll(re2)) spans.push({s:m.index, e:m.index + m[0].length, cat:"DNI", key:n});
+  }
+  return spans;
+}
+function cuitValid(d){
+  if (d.length !== 11) return false;
+  const w = [5,4,3,2,7,6,5,4,3,2]; let sum = 0;
+  for (let i = 0; i < 10; i++) sum += +d[i] * w[i];
+  let v = 11 - (sum % 11); if (v === 11) v = 0; if (v === 10) v = 9;
+  return v === +d[10];
+}
+function detectCUIT(text){
+  const spans = [];
+  const re = /(?<![\d.\/-])(20|23|24|27|30|33|34)\s?[-‐–]?\s?(\d{1,2}\.?\d{3}\.?\d{3})\s?[-‐–\/]?\s?(\d)(?![\d])/g;
+  for (const m of text.matchAll(re)){
+    const d = digits(m[0]);
+    if (d.length !== 11) continue;
+    const before = text.slice(Math.max(0, m.index - 40), m.index);
+    const lab = [...before.matchAll(/C\.?\s?U\.?\s?I\.?\s?([LT])/gi)].pop();
+    if (!lab && !cuitValid(d)) continue;
+    const cat = lab ? (lab[1].toUpperCase() === "L" ? "CUIL" : "CUIT") : (/^3/.test(d) ? "CUIT" : "CUIL");
+    spans.push({s:m.index, e:m.index + m[0].length, cat, key:d, idKey:"CUITL|" + d});
+  }
+  return spans;
+}
+function detectEmail(text){
+  const spans = [];
+  for (const m of text.matchAll(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g))
+    spans.push({s:m.index, e:m.index + m[0].length, cat:"EMAIL", key:m[0].toLowerCase()});
+  return spans;
+}
+function detectPhones(text){
+  const spans = [];
+  const add = (s, raw) => {
+    raw = raw.replace(/[\s.\-\/(]+$/,"");
+    const d = digits(raw);
+    if (d.length < 7 || d.length > 13) return;
+    spans.push({s, e:s + raw.length, cat:"TELEFONO", key:d.slice(-8)});
+  };
+  const reLab = /(?<![\wáéíóúñ])(?:[Tt]el(?:[ée]fono)?s?|TEL(?:[ÉE]FONO)?S?|[Cc]el(?:ular)?|CEL(?:ULAR)?|[Mm][oó]vil|[Ww]hats[Aa]pp|WHATSAPP|[Ff]ax|FAX|[Tt]\.?\s?[Ee]\.)\.?\s*(?:[Nn](?:[°º]|ro\.?)\s*)?(?:de\s+contacto\s*)?[:.]?\s*(\+?\(?\d[\d \t()./-]{5,22}\d)/g;
+  for (const m of text.matchAll(reLab)) add(m.index + m[0].length - m[1].length, m[1]);
+  const reFree = /(?<![\w\/.,-])(?:\+\s?54[\s-]?(?:9[\s-]?)?\(?\d{2,4}\)?[\s-]?(?:15[\s-]?)?\d{3,4}[\s-]?\d{4}|\(\s?0?\d{2,4}\s?\)\s?(?:15[\s-]?)?\d{3,4}[\s-]?\d{4}|0?\d{2,4}[\s-](?:15[\s-]?)?\d{3,4}-\d{4}|0\d{2,4}[\s-]?15[\s-]?\d{6,8}|0\d{2,4}-\d{6,8}|15[\s-]?\d{4}-\d{4})(?![\w\/-])/g;
+  for (const m of text.matchAll(reFree)) add(m.index, m[0]);
+  return spans;
+}
+
+/* ============================================================
+   Domicilios
+   ============================================================ */
+const STREET = String.raw`(?:calle|avenida|av\.|avda\.|pasaje|pje\.|psje\.|boulevard|bulevar|bv\.|bvard\.|diagonal|diag\.|ruta(?:\s+(?:nacional|provincial|nac\.|prov\.))?|camino)`;
+const NUM = String.raw`(?:N[°º]\.?\s*|nro\.?\s*|n[uú]mero\s*|n\.\s*)?(?:(?:\d{1,2}\.\d{3}|\d{1,5})(?:\s?bis)?|s\/n[°º]?)`;
+const EXTRA = String.raw`(?:\s*[,-]?\s*(?:piso|p\.|planta\s+alta|planta\s+baja|dpto\.?|depto\.?|dto\.?|departamento|of\.?|oficina|local|torre|block|casa|lote|manzana|mz\.?|mza\.?|unidad(?:\s+funcional)?|u\.\s?f\.)\s*(?:N[°º]\.?\s*)?[\"“]?[A-Za-z0-9º°]{0,4}[\"”]?[°º]?)*`;
+const ADDR_END = String.raw`(?=\s*(?:[,;:)\]\n]|\.(?:\s|$)|$)|\s+(?:de|del|en|entre|y|e|donde|a|para|ubicad[oa]|sit[oa]|esquina|esq\.|casi|localidad|barrio)\b|\s*[-–—])`;
+function detectAddresses(text){
+  const spans = [];
+  const push = (s, raw) => {
+    raw = raw.replace(/[\s,;.-]+$/,"");
+    if (!/\d|s\/n/i.test(raw)) return;
+    const key = fold(raw).replace(new RegExp("^" + STREET + String.raw`\s*`, "i"), "")
+      .replace(/\b(n[°º]|nro\.?|numero|n\.)\s*/g,"").replace(/[^\w\s]/g," ").replace(/\s+/g," ").trim();
+    spans.push({s, e:s + raw.length, cat:"DOMICILIO", key});
+  };
+  // A) Con tipo de vía: "calle San Martín N° 1234, piso 3, dpto. B"
+  const reA = new RegExp(String.raw`(?<![\wáéíóúñ])${STREET}\s*(?:[^\s,;\n]+\s+){0,6}${NUM}${EXTRA}${ADDR_END}`, "gi");
+  for (const m of text.matchAll(reA)) push(m.index, m[0]);
+  // B) Tras "domicilio en…", "domiciliado en…", "sito en…"
+  const reB = new RegExp(String.raw`(?:domicili(?:o|ad[oa]s?)(?:\s+(?:real|legal|procesal|constituido|especial|fiscal|laboral|comercial|particular))?(?:\s+(?:constituido|sito))?(?:\s+en)?(?:\s+(?:la\s+)?calle)?|sit[oa]s?\s+en(?:\s+(?:la\s+)?calle)?|reside\s+en|residente\s+en|vive\s+en|con\s+asiento\s+en)\s*:?\s*((?:[^\s,;\n]+\s+){0,6}${NUM}${EXTRA})${ADDR_END}`, "gi");
+  for (const m of text.matchAll(reB)){
+    const g = m[1], s = m.index + m[0].length - g.length;
+    if (!/^[A-ZÁÉÍÓÚÑ0-9]/.test(g)) continue;
+    if (/^(?:electr|el\s|la\s|los\s|autos)/i.test(g)) continue;
+    push(s, g);
+  }
+  // C) Barrios, manzanas y lotes
+  const reC = new RegExp(String.raw`(?<![\wáéíóúñ])(?:[Bb]arrio|BARRIO|B[°º]\.?)\s+([A-ZÁÉÍÓÚÑ0-9][^,;.\n]{1,40}?)${EXTRA}(?=\s*[,;.\n)]|\s+de\s|\s+en\s|$)`, "gi");
+  for (const m of text.matchAll(reC)){
+    const raw = m[0];
+    if (!/(manzana|mz|mza|lote|casa|dpto|depto|block|torre|\d)/i.test(raw)) continue;
+    push(m.index, raw);
+  }
+  return spans;
+}
+
+/* ============================================================
+   Datos de salud (se buscan sobre el texto plegado: sin tildes, en minúsculas)
+   ============================================================ */
+const HEALTH_TERMS = `
+fractura|fracturas|fisura|esguince|luxacion|subluxacion|traumatismo encefalocraneano|traumatismo encefalo craneano|traumatismo craneoencefalico|
+traumatismo|traumatismos|politraumatismo|politraumatismos|politraumatizado|politraumatizada|contusion|contusiones|hematoma|hematomas|equimosis|
+escoriacion|escoriaciones|excoriaciones|herida cortante|heridas cortantes|herida contusa|heridas contusas|herida punzante|herida de arma blanca|herida de arma de fuego|
+quemadura|quemaduras|amputacion|desgarro|desgarros|rotura de ligamento|rotura de meniscos?|rotura del ligamento|lesion meniscal|lesion ligamentaria|
+hernia de disco|hernia discal|hernias discales|hernia inguinal|discopatia|discopatias|protrusion discal|protrusiones discales|
+cervicalgia|dorsalgia|lumbalgia|lumbociatalgia|lumbociatica|ciatalgia|ciatica|epicondilitis|tendinitis|tendinopatia|bursitis|artrosis|artritis|
+sindrome del tunel carpiano|tunel carpiano|latigazo cervical|esguince cervical|rectificacion de la lordosis|tec|t\\.e\\.c\\.|
+conmocion cerebral|perdida de conocimiento|cefalea|cefaleas|vertigo|vertigos|acufenos|hipoacusia|ceguera|
+diabetes|hipertension arterial|hipertension|cardiopatia|infarto agudo de miocardio|infarto|acv|accidente cerebrovascular|accidente cerebro vascular|arritmia|
+insuficiencia renal|insuficiencia cardiaca|insuficiencia respiratoria|cancer|carcinoma|tumor|neoplasia|leucemia|linfoma|metastasis|
+vih|hiv|sida|hepatitis|tuberculosis|covid-19|covid|neumonia|epoc|asma|obesidad morbida|
+depresion|sindrome depresivo|cuadro depresivo|trastorno depresivo|trastorno de ansiedad|trastorno de estres postraumatico|estres postraumatico|tept|
+trastorno bipolar|trastorno psiquiatrico|trastorno mental|trastorno de la personalidad|trastorno obsesivo compulsivo|ataques? de panico|crisis de angustia|
+ansiedad generalizada|esquizofrenia|psicosis|epilepsia|alzheimer|parkinson|demencia|autismo|trastorno del espectro autista|tdah|sindrome de down|paralisis cerebral|
+discapacidad|certificado unico de discapacidad|cud|secuelas? (?:fisicas|psiquicas|psicologicas|incapacitantes|funcionales)|limitacion funcional|
+embarazo|embarazada|aborto|interrupcion del embarazo|adiccion|adicciones|consumo problematico|alcoholismo|drogadiccion|
+cirugia|cirugias|intervencion quirurgica|intervenciones quirurgicas|operad[oa] de|osteosintesis|artroscopia|protesis|artrodesis|
+kinesiologia|kinesioterapia|fisioterapia|fisiokinesioterapia|sesiones de kinesiologia|rehabilitacion kinesiologica|rehabilitacion fisica|
+quimioterapia|radioterapia|dialisis|hemodialisis|psicoterapia|tratamiento psiquiatrico|tratamiento psicologico|tratamiento oncologico|
+tratamiento farmacologico|tratamiento kinesiologico|tratamiento de rehabilitacion|internacion psiquiatrica|antidepresivos|ansioliticos|antipsicoticos|insulina|
+clonazepam|alprazolam|sertralina|fluoxetina|escitalopram|quetiapina|risperidona|litio|metformina|enalapril`.replace(/\s*\n\s*/g,"");
+const H_ADJ = String.raw`(?:expuesta|cerrada|multiples?|conminuta|leves?|graves?|severa|severo|cronic[oa]s?|agud[oa]s?|cervical(?:es)?|lumbar(?:es)?|dorsal(?:es)?|lumbosacra|craneal(?:es)?|facial(?:es)?|toracic[oa]s?|abdominal(?:es)?|izquierd[oa]s?|derech[oa]s?|bilateral(?:es)?|postraumatic[oa]s?|moderad[oa]s?|arterial|mellitus|tipo\s+(?:1|2|i|ii)|recurrentes?|generalizad[oa]|reactiv[oa]|profund[oa]s?|superficial(?:es)?|desplazada|de\s+grado\s+\w+)`;
+const H_NOUN_NOT = String.raw`(?!(?:que|su|sus|este|esta|dicho|dicha|actor|actora|mi|autos|fecha|trabajo|accidente|hecho|ello|parte|caso|demandad[oa])\b)`;
+const H_COMP = String.raw`(?:\s+(?:de|del|en)\s+(?:(?:la|el|los|las|ambos|ambas|un|una)\s+)?${H_NOUN_NOT}[a-z]{3,}(?:\s+${H_ADJ}){0,2})`;
+function detectHealth(text, ftext){
+  const spans = [];
+  const add = (s, e) => {
+    const raw = text.slice(s, e).replace(/[\s,;.:-]+$/,"");
+    if (raw.length < 2) return;
+    spans.push({s, e:s + raw.length, cat:"SALUD", key:fold(raw)});
+  };
+  const reDict = new RegExp(String.raw`(?<![a-z0-9])(?:${HEALTH_TERMS})(?![a-z0-9])(?:\s+${H_ADJ}){0,3}(?:${H_COMP}){0,2}(?:\s+(?:y|e)\s+${H_ADJ})?`, "g");
+  const dictStarts = [];
+  for (const m of ftext.matchAll(reDict)){ add(m.index, m.index + m[0].length); dictStarts.push(m.index); }
+  // Incapacidad con porcentaje
+  const reInc = /(?<![a-z])incapacidad(?:\s+(?:parcial|total|absoluta|laboral|fisica|psiquica|psicologica|sobreviniente|permanente|transitoria|definitiva|y|e|,))*\s*(?:del?\s+|en\s+(?:un|el)\s+|estimada\s+en\s+(?:un|el)?\s*)?\d{1,3}(?:[.,]\d+)?\s?(?:%|por\s+ciento)/g;
+  for (const m of ftext.matchAll(reInc)) add(m.index, m.index + m[0].length);
+  // Frases disparadoras: "diagnosticado con…", "padece…", "lesiones consistentes en…"
+  const reTrig = /(?:diagnosticad[oa]s?\s+(?:con|de)|con\s+diagnostico\s+de|diagnostico\s+(?:presuntivo\s+|definitivo\s+|medico\s+)?(?:de\s+|:\s*)|padec(?:e|ia|io|iendo|er)(?:\s+de)?|sufr(?:e|ia|iendo)\s+de|lesiones\s+(?:que\s+)?consist(?:entes|ieron|en)\s+en|cuadro\s+clinico\s+de|patologia\s+(?:de\s+)?|afeccion\s+(?:de\s+)?|enfermedad\s+de\s+)\s*([^.;:\n()]{3,90}?)(?=\s*(?:[.;:\n(]|,\s|$)|\s+(?:que|lo|la|le|por|segun|conforme|desde|como\s+consecuencia|a\s+raiz|motivo|razon|debido)\s)/g;
+  for (const m of ftext.matchAll(reTrig)){
+    const g = m[1]; const s = m.index + m[0].length - g.length;
+    if (/^(?:el|la|los|las|un|una|lo)\s*$/.test(g)) continue;
+    if (dictStarts.some(d => d >= s && d <= s + 4)) continue; // ya lo cubre el diccionario, con límites más precisos
+    add(s, s + g.length);
+  }
+  return spans;
+}
+
+/* ============================================================
+   Entradas manuales
+   ============================================================ */
+function detectManual(text, ftext, manual){
+  const spans = [];
+  for (const it of manual){
+    const toks = fold(it.text).split(" ").filter(Boolean);
+    if (!toks.length) continue;
+    const re = new RegExp(String.raw`(?<![a-z0-9ñ])` + toks.map(reEsc).join(String.raw`\s+`) + String.raw`(?![a-z0-9ñ])`, "g");
+    for (const m of ftext.matchAll(re))
+      spans.push({s:m.index, e:m.index + m[0].length, cat:it.cat, key:"m:" + fold(it.text), manual:true});
+  }
+  return spans;
+}
+
+/* ============================================================
+   Motor: detecta, resuelve solapamientos, numera marcadores
+   ============================================================ */
+const state = {
+  fileName: "", raw: null, text: "", manual: [], disabled: new Set(), groupsOff: new Set(),
+  applied: [], ents: new Map(), candidatesByEnt: new Map(),
+};
+
+function analyze(){
+  const text = state.text, ftext = foldKeep(text);
+  let cands = [];
+  const on = g => !state.groupsOff.has(g);
+  if (on("PERSONA")) cands.push(...detectPersons(text, ftext));
+  if (on("DNI")) cands.push(...detectDNI(text));
+  if (on("CUIT")) cands.push(...detectCUIT(text));
+  if (on("DOMICILIO")) cands.push(...detectAddresses(text));
+  if (on("TELEFONO")) cands.push(...detectPhones(text));
+  if (on("EMAIL")) cands.push(...detectEmail(text));
+  if (on("SALUD")) cands.push(...detectHealth(text, ftext));
+  cands.push(...detectManual(text, ftext, state.manual));
+
+  // Identidad de cada dato (CUIL/CUIT comparten número)
+  for (const c of cands){
+    c.id = c.idKey || (c.cat + "|" + c.key);
+    c.prio = c.manual ? 10 : CATS[c.cat].prio;
+  }
+  // Entidades (incluye las desactivadas, para poder reactivarlas)
+  const ents = new Map();
+  for (const c of cands){
+    let e = ents.get(c.id);
+    if (!e){ e = {id:c.id, cat:c.cat, first:c.s, display:text.slice(c.s, c.e).replace(/\s+/g," "), label:c.label, manual:!!c.manual, count:0, n:0}; ents.set(c.id, e); }
+    if (c.s < e.first){ e.first = c.s; e.display = text.slice(c.s, c.e).replace(/\s+/g," "); e.cat = c.cat; }
+    const disp = text.slice(c.s, c.e).replace(/\s+/g," ");
+    if (disp.length > e.display.length && c.cat === "PERSONA") e.display = disp;
+  }
+  // Selección sin solapamientos: prioridad, luego longitud
+  const act = cands.filter(c => !state.disabled.has(c.id))
+    .sort((a,b) => b.prio - a.prio || (b.e - b.s) - (a.e - a.s) || a.s - b.s);
+  const taken = [];
+  const overlaps = (s, e) => taken.some(t => s < t.e && e > t.s);
+  const applied = [];
+  for (const c of act){
+    if (c.e <= c.s || overlaps(c.s, c.e)) continue;
+    taken.push(c); applied.push(c);
+  }
+  applied.sort((a,b) => a.s - b.s);
+  // Numeración por orden de aparición
+  const counters = {};
+  for (const c of applied){
+    const e = ents.get(c.id);
+    if (!e.n){ counters[e.cat] = (counters[e.cat] || 0) + 1; e.n = counters[e.cat]; }
+    e.count++;
+  }
+  for (const e of ents.values()) e.marker = e.n ? `[${CATS[e.cat].label} ${e.n}]` : `[${CATS[e.cat].label}]`;
+  state.applied = applied; state.ents = ents;
+}
+
+function anonymizedText(){
+  let out = "", pos = 0;
+  for (const c of state.applied){ out += state.text.slice(pos, c.s) + state.ents.get(c.id).marker; pos = c.e; }
+  return out + state.text.slice(pos);
+}
+
+/* ============================================================
+   Extracción de texto del PDF
+   ============================================================ */
+async function extractPdf(buf){
+  const pdfjsLib = globalThis.pdfjsLib;
+  const doc = await pdfjsLib.getDocument({data: new Uint8Array(buf), isEvalSupported:false, disableFontFace:true, useSystemFonts:false, stopAtErrors:false}).promise;
+  const pages = [];
+  for (let p = 1; p <= doc.numPages; p++){
+    const page = await doc.getPage(p);
+    const tc = await page.getTextContent();
+    const lines = []; let cur = null;
+    for (const it of tc.items){
+      if (typeof it.str !== "string") continue;
+      const x = it.transform[4], y = it.transform[5];
+      const h = Math.abs(it.transform[3]) || it.height || 10;
+      if (cur && Math.abs(y - cur.y) > h * 0.45){ lines.push(cur); cur = null; }
+      if (!cur) cur = {text:"", y, h, x0:x, xe:x};
+      else if (it.str && x - cur.xe > h * 0.18 && !/\s$/.test(cur.text) && !/^\s/.test(it.str)) cur.text += " ";
+      cur.text += it.str;
+      cur.xe = x + (it.width || 0);
+      cur.h = Math.max(cur.h, h);
+      if (it.hasEOL){ lines.push(cur); cur = null; }
+    }
+    if (cur) lines.push(cur);
+    const clean = lines.map(l => ({...l, text:l.text.replace(/\s+/g," ").trim()})).filter(l => l.text);
+    // Separación de párrafos por interlineado
+    const gaps = [];
+    for (let i = 1; i < clean.length; i++){ const g = clean[i-1].y - clean[i].y; if (g > 0) gaps.push(g); }
+    gaps.sort((a,b) => a-b);
+    const med = gaps.length ? gaps[Math.floor(gaps.length/2)] : 0;
+    const maxLen = Math.max(1, ...clean.map(l => l.text.length));
+    for (let i = 0; i < clean.length; i++){
+      const l = clean[i];
+      let para = i === 0;
+      if (i > 0){
+        const prev = clean[i-1], g = prev.y - l.y;
+        if (g <= 0 || (med && g > med * 1.4)) para = true;
+        else if (/[.:;]$/.test(prev.text) && prev.text.length < maxLen * 0.8) para = true;
+        else if (l.x0 - prev.x0 > l.h * 1.5 && /[.:;]$/.test(prev.text)) para = true;
+      }
+      l.para = para;
+    }
+    pages.push(clean);
+  }
+  return pages;
+}
+function buildText(pages, join){
+  const paras = [];
+  for (const lines of pages){
+    let cur = null;
+    for (const l of lines){
+      if (l.para || !cur){ if (cur !== null) paras.push(cur); cur = l.text; continue; }
+      if (!join){ cur += "\n" + l.text; continue; }
+      if (/[A-Za-zÁÉÍÓÚÑáéíóúñü]-$/.test(cur) && /^[a-záéíóúñü]/.test(l.text)) cur = cur.slice(0, -1) + l.text;
+      else cur += " " + l.text;
+    }
+    if (cur !== null) paras.push(cur);
+  }
+  return paras.join("\n\n");
+}
+
+/* ============================================================
+   Interfaz
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const left = $("left"), right = $("right");
+
+function catStyle(cat){ return `background:var(--c-${cat});color:var(--k-${cat})`; }
+
+function render(){
+  analyze();
+  const {text, applied, ents} = state;
+  let L = "", R = "", pos = 0;
+  applied.forEach((c, i) => {
+    const e = ents.get(c.id);
+    const plain = esc(text.slice(pos, c.s));
+    L += plain; R += plain;
+    const attrs = `data-i="${i}" data-id="${esc(c.id)}" style="${catStyle(e.cat)}"`;
+    L += `<mark ${attrs} data-tip="${esc(e.marker)}">${esc(text.slice(c.s, c.e))}</mark>`;
+    R += `<mark class="m" ${attrs} data-tip="${esc(text.slice(c.s, c.e).replace(/\s+/g," "))}">${esc(e.marker)}</mark>`;
+    pos = c.e;
+  });
+  const tail = esc(text.slice(pos));
+  const ls = left.scrollTop, rs = right.scrollTop;
+  left.innerHTML = L + tail; right.innerHTML = R + tail;
+  left.scrollTop = ls; right.scrollTop = rs;
+
+  // Estadísticas
+  const used = [...ents.values()].filter(e => e.count);
+  const byCat = {};
+  for (const e of used) byCat[CATS[e.cat].name] = (byCat[CATS[e.cat].name] || 0) + 1;
+  $("stats").textContent = applied.length
+    ? `${applied.length} reemplazos de ${used.length} datos distintos — ` + Object.entries(byCat).map(([k,v]) => `${k}: ${v}`).join(" · ")
+    : "No se detectaron datos personales. Podés agregarlos a mano seleccionando texto en el original.";
+
+  renderTable();
+}
+
+function renderTable(){
+  const rows = [...state.ents.values()].filter(e => e.count || e.manual || state.disabled.has(e.id)).sort((a,b) => {
+    const ka = Object.keys(CATS).indexOf(a.cat), kb = Object.keys(CATS).indexOf(b.cat);
+    return ka - kb || (a.n || 1e9) - (b.n || 1e9) || a.first - b.first;
+  });
+  $("tbody").innerHTML = rows.map(e => {
+    const off = state.disabled.has(e.id);
+    return `<tr data-id="${esc(e.id)}" class="${off ? "off" : ""}">
+      <td><input type="checkbox" ${off ? "" : "checked"} aria-label="Anonimizar"></td>
+      <td><span class="tag" style="${catStyle(e.cat)}">${esc(off ? CATS[e.cat].name : e.marker)}</span></td>
+      <td class="orig">${esc(e.display)}</td>
+      <td>${off ? "—" : e.count}</td>
+      <td>${e.manual ? `<button class="x" title="Quitar" data-rm="1">×</button>` : ""}</td></tr>`;
+  }).join("") || `<tr><td colspan="5" style="color:var(--muted)">Sin datos.</td></tr>`;
+}
+
+function renderChips(){
+  $("chips").innerHTML = GROUPS.map(g => {
+    const off = state.groupsOff.has(g.id);
+    return `<label class="chip ${off ? "off" : ""}" style="${catStyle(g.cats[0])}"><input type="checkbox" data-g="${g.id}" ${off ? "" : "checked"}>${g.name}</label>`;
+  }).join("");
+}
+
+function setText(){
+  state.text = state.raw.pages ? buildText(state.raw.pages, $("optJoin").checked) : state.raw.plain;
+  render();
+}
+
+function showApp(){
+  $("start").style.display = "none"; $("app").style.display = "block";
+  $("fileName").textContent = state.fileName;
+  renderChips();
+  setText();
+}
+
+async function loadFile(file){
+  if (!file) return;
+  $("busy").style.display = "block"; $("busy").textContent = "Leyendo " + file.name + "…";
+  $("notice").innerHTML = "";
+  try {
+    const buf = await file.arrayBuffer();
+    state.fileName = file.name; state.manual = []; state.disabled = new Set();
+    if (/\.txt$/i.test(file.name) || file.type === "text/plain"){
+      state.raw = {plain: new TextDecoder("utf-8").decode(buf)};
+    } else {
+      const pages = await extractPdf(buf);
+      state.raw = {pages};
+      const chars = pages.reduce((n, p) => n + p.reduce((m, l) => m + l.text.length, 0), 0);
+      if (chars < 30 * pages.length)
+        $("notice").innerHTML = `<p class="notice">Este PDF casi no contiene texto: probablemente es un documento escaneado (imagen). Para anonimizarlo hace falta pasarlo antes por un programa de OCR.</p>`;
+    }
+    showApp();
+  } catch (err){
+    console.error(err);
+    alert("No se pudo leer el archivo: " + (err && err.message ? err.message : err));
+  } finally {
+    $("busy").style.display = "none";
+  }
+}
+
+function download(name, content, type){
+  const blob = new Blob([content], {type});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+function baseName(){ return (state.fileName || "escrito").replace(/\.[^.]+$/,""); }
+
+/* ---------- Eventos ---------- */
+const drop = $("drop"), fileIn = $("file");
+drop.addEventListener("click", () => fileIn.click());
+drop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); fileIn.click(); } });
+fileIn.addEventListener("change", () => { loadFile(fileIn.files[0]); fileIn.value = ""; });
+["dragenter","dragover"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave","drop"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => loadFile(e.dataTransfer.files[0]));
+// Evita que un archivo soltado fuera de la zona reemplace la página
+window.addEventListener("dragover", e => e.preventDefault());
+window.addEventListener("drop", e => { e.preventDefault(); if ($("app").style.display === "block" && e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+
+$("pasteToggle").addEventListener("click", () => { $("pasteBox").style.display = "block"; $("pasteArea").focus(); });
+$("pasteGo").addEventListener("click", () => {
+  const t = $("pasteArea").value;
+  if (!t.trim()) return;
+  state.fileName = "texto-pegado.txt"; state.raw = {plain:t}; state.manual = []; state.disabled = new Set();
+  showApp();
+});
+$("another").addEventListener("click", () => { $("app").style.display = "none"; $("start").style.display = "block"; $("pasteArea").value = ""; });
+
+$("optJoin").addEventListener("change", setText);
+$("chips").addEventListener("change", e => {
+  const g = e.target.dataset.g; if (!g) return;
+  e.target.checked ? state.groupsOff.delete(g) : state.groupsOff.add(g);
+  renderChips(); render();
+});
+
+$("dlBtn").addEventListener("click", () => download(baseName() + "-anonimizado.txt", anonymizedText(), "text/plain;charset=utf-8"));
+$("copyBtn").addEventListener("click", async () => {
+  const t = anonymizedText();
+  try { await navigator.clipboard.writeText(t); }
+  catch { const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); }
+  $("copyBtn").textContent = "¡Copiado!"; setTimeout(() => $("copyBtn").textContent = "Copiar", 1500);
+});
+$("csvBtn").addEventListener("click", () => {
+  if (!confirm("La tabla de equivalencias contiene los datos personales reales junto a cada marcador. ¿Descargarla?")) return;
+  const q = s => `"${String(s).replace(/"/g,'""')}"`;
+  const rows = [...state.ents.values()].filter(e => e.count && !state.disabled.has(e.id)).sort((a,b) => a.first - b.first);
+  const csv = "﻿" + ["Marcador;Categoría;Dato original;Apariciones", ...rows.map(e => [q(e.marker), q(CATS[e.cat].name), q(e.display), e.count].join(";"))].join("\r\n");
+  download(baseName() + "-equivalencias.csv", csv, "text/csv;charset=utf-8");
+});
+
+// Tabla: activar/desactivar y quitar entradas manuales
+$("tbody").addEventListener("change", e => {
+  const tr = e.target.closest("tr"); if (!tr) return;
+  const id = tr.dataset.id;
+  e.target.checked ? state.disabled.delete(id) : state.disabled.add(id);
+  render();
+});
+$("tbody").addEventListener("click", e => {
+  if (!e.target.dataset.rm) return;
+  const id = e.target.closest("tr").dataset.id;
+  state.manual = state.manual.filter(m => (m.cat + "|m:" + fold(m.text)) !== id);
+  state.disabled.delete(id);
+  render();
+});
+
+// Agregar manualmente
+const addCat = $("addCat");
+addCat.innerHTML = ["PERSONA","DNI","CUIL","CUIT","DOMICILIO","TELEFONO","EMAIL","SALUD","OTRO"].map(c => `<option value="${c}">${CATS[c].name === "Otros" ? "Otro dato" : CATS[c].label.charAt(0) + CATS[c].label.slice(1).toLowerCase()}</option>`).join("");
+function addManual(text, cat){
+  text = text.replace(/\s+/g," ").trim();
+  if (!text) return;
+  if (!state.manual.some(m => fold(m.text) === fold(text) && m.cat === cat)) state.manual.push({text, cat});
+  state.disabled.delete(cat + "|m:" + fold(text));
+  render();
+}
+$("addBtn").addEventListener("click", () => { addManual($("addText").value, addCat.value); $("addText").value = ""; });
+$("addText").addEventListener("keydown", e => { if (e.key === "Enter") $("addBtn").click(); });
+
+// Selección en el original → barra flotante para anonimizar
+const selBar = $("selBar");
+selBar.innerHTML = `<span>Anonimizar como:</span>` + ["PERSONA","DOMICILIO","SALUD","OTRO"].map(c =>
+  `<button data-c="${c}" style="${catStyle(c)}">${c === "OTRO" ? "Otro" : CATS[c].label.charAt(0) + CATS[c].label.slice(1).toLowerCase()}</button>`).join("");
+let selText = "";
+left.addEventListener("mouseup", () => setTimeout(() => {
+  const sel = window.getSelection();
+  const t = sel ? sel.toString().trim() : "";
+  if (!t || t.length > 200 || !left.contains(sel.anchorNode)){ selBar.style.display = "none"; return; }
+  selText = t;
+  const r = sel.getRangeAt(0).getBoundingClientRect();
+  selBar.style.display = "flex";
+  selBar.style.left = Math.max(8, Math.min(window.innerWidth - selBar.offsetWidth - 8, r.left)) + "px";
+  selBar.style.top = (r.bottom + 8 + selBar.offsetHeight > window.innerHeight ? r.top - selBar.offsetHeight - 8 : r.bottom + 8) + "px";
+}, 0));
+selBar.addEventListener("mousedown", e => e.preventDefault());
+selBar.addEventListener("click", e => {
+  const c = e.target.dataset.c; if (!c) return;
+  addManual(selText, c); selBar.style.display = "none"; window.getSelection().removeAllRanges();
+});
+document.addEventListener("mousedown", e => { if (!selBar.contains(e.target)) selBar.style.display = "none"; });
+
+// Resaltado cruzado, tooltip y navegación
+const tip = $("tip");
+function hl(id, on){ document.querySelectorAll(`.doc mark[data-id="${CSS.escape(id)}"]`).forEach(m => m.classList.toggle("hl", on)); }
+for (const pane of [left, right]){
+  pane.addEventListener("mouseover", e => {
+    const m = e.target.closest("mark"); if (!m) return;
+    hl(m.dataset.id, true);
+    tip.textContent = (pane === left ? "→ " : "Original: ") + m.dataset.tip;
+    tip.style.display = "block";
+  });
+  pane.addEventListener("mousemove", e => { tip.style.left = Math.min(window.innerWidth - tip.offsetWidth - 8, e.clientX + 12) + "px"; tip.style.top = (e.clientY + 16) + "px"; });
+  pane.addEventListener("mouseout", e => { const m = e.target.closest("mark"); if (!m) return; hl(m.dataset.id, false); tip.style.display = "none"; });
+  pane.addEventListener("click", e => {
+    const m = e.target.closest("mark"); if (!m || (window.getSelection() + "").length) return;
+    const other = pane === left ? right : left;
+    const twin = other.querySelector(`mark[data-i="${m.dataset.i}"]`);
+    if (twin){
+      syncing = true;
+      other.scrollTop += twin.getBoundingClientRect().top - m.getBoundingClientRect().top;
+      requestAnimationFrame(() => syncing = false);
+    }
+    const tr = $("tbody").querySelector(`tr[data-id="${CSS.escape(m.dataset.id)}"]`);
+    if (tr){ tr.classList.remove("flash"); void tr.offsetWidth; tr.classList.add("flash"); tr.scrollIntoView({block:"nearest"}); }
+  });
+}
+// Desplazamiento sincronizado (proporcional)
+let syncing = false;
+function sync(from, to){
+  if (!$("optSync").checked || syncing) return;
+  syncing = true;
+  const max = from.scrollHeight - from.clientHeight;
+  to.scrollTop = max > 0 ? (from.scrollTop / max) * (to.scrollHeight - to.clientHeight) : 0;
+  requestAnimationFrame(() => syncing = false);
+}
+left.addEventListener("scroll", () => sync(left, right));
+right.addEventListener("scroll", () => sync(right, left));
+
+// Exponer funciones para pruebas automatizadas
+window.__anon = {state, analyze, anonymizedText, buildText, extractPdf};
+</script>
+</body>
+</html>
