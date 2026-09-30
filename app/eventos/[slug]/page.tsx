@@ -261,6 +261,7 @@ export default function EventDetailPage() {
                           <img
                             src={image || "/placeholder.svg"}
                             alt={`${event.title} - imagen ${index + 1}`}
+                            loading="lazy"
                             className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                           />
                         </div>
@@ -342,6 +343,7 @@ export default function EventDetailPage() {
                         <img
                           src={similarEvent.image || "/placeholder.svg"}
                           alt={similarEvent.title}
+                          loading="lazy"
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                         />
                       </div>
