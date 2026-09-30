@@ -153,7 +153,8 @@ export async function deleteEvent(id: string): Promise<boolean> {
 export async function uploadEventImage(file: File, path: string): Promise<string> {
   const { error } = await supabase.storage
     .from('event-images')
-    .upload(path, file, { upsert: true });
+    // Paths are unique per upload, so browsers/CDN can cache them for a year
+    .upload(path, file, { upsert: true, cacheControl: '31536000' });
 
   if (error) {
     console.error('Error uploading image:', error);

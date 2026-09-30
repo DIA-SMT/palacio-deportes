@@ -47,6 +47,7 @@ import {
     EventCategory,
     EventStatus,
 } from '@/data/events';
+import { compressImage } from '@/lib/compress-image';
 
 // ── Helpers ────────────────────────────────────────────────
 function generateSlug(title: string): string {
@@ -195,9 +196,10 @@ export default function AdminEventsPage() {
 
         setUploading(true);
         try {
-            const ext = file.name.split('.').pop();
+            const compressed = await compressImage(file);
+            const ext = compressed.name.split('.').pop();
             const path = `events/${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
-            await uploadEventImage(file, path);
+            await uploadEventImage(compressed, path);
             updateFormField('image', path);
         } catch {
             setFormError('Error al subir la imagen');
@@ -214,7 +216,8 @@ export default function AdminEventsPage() {
         setUploadingGallery(true);
         try {
             const newPaths: string[] = [];
-            for (const file of Array.from(files)) {
+            for (const original of Array.from(files)) {
+                const file = await compressImage(original);
                 const ext = file.name.split('.').pop();
                 const path = `events/gallery/${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
                 await uploadEventImage(file, path);
