@@ -18,7 +18,7 @@ const QUICK_SUGGESTIONS = [
 const WELCOME_MESSAGE: Message = {
     role: "assistant",
     content:
-        "¡Buenas! 👋 Soy Pali, el asistente del Palacio de los Deportes. ¿En qué te puedo ayudar, che? Preguntame lo que quieras sobre eventos, cómo llegar, entradas... ¡lo que sea!",
+        "¡Buenas! 👋 Soy Migue, el asistente del Palacio de los Deportes. ¿En qué te puedo ayudar, che? Preguntame lo que quieras sobre eventos, cómo llegar, entradas... ¡lo que sea!",
 };
 
 export function VirtualAssistant() {
@@ -110,19 +110,16 @@ export function VirtualAssistant() {
                 <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#1e2a4a] to-[#0f1929] rounded-t-2xl border-b border-white/10 flex-shrink-0">
                     <div className="relative">
                         <div className="w-10 h-10 rounded-full overflow-hidden shadow-lg flex-shrink-0">
-                            <video
-                                src="/pali-animado.mp4"
-                                autoPlay
-                                loop
-                                muted
-                                playsInline
+                            <img
+                                src="/migue-animado.webp"
+                                alt=""
                                 className="w-full h-full object-cover"
                             />
                         </div>
                         <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#111318]" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-white text-sm">Pali</div>
+                        <div className="font-semibold text-white text-sm">Migue</div>
                         <div className="text-xs text-emerald-400">En línea · Asistente del Palacio</div>
                     </div>
                     <button
@@ -143,12 +140,9 @@ export function VirtualAssistant() {
                         >
                             {msg.role === "assistant" && (
                                 <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 mt-0.5">
-                                    <video
-                                        src="/pali-animado.mp4"
-                                        autoPlay
-                                        loop
-                                        muted
-                                        playsInline
+                                    <img
+                                        src="/migue-animado.webp"
+                                        alt=""
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
@@ -168,12 +162,9 @@ export function VirtualAssistant() {
                     {isLoading && (
                         <div className="flex gap-2 flex-row">
                             <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 mt-0.5">
-                                <video
-                                    src="/pali-animado.mp4"
-                                    autoPlay
-                                    loop
-                                    muted
-                                    playsInline
+                                <img
+                                    src="/migue-animado.webp"
+                                    alt=""
                                     className="w-full h-full object-cover"
                                 />
                             </div>
@@ -236,7 +227,7 @@ export function VirtualAssistant() {
                 onClick={() => setIsOpen((v) => !v)}
                 className={`fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full shadow-xl shadow-blue-900/40 overflow-hidden flex items-center justify-center transition-all duration-300 ${isOpen
                     ? "ring-2 ring-white/20 hover:scale-105"
-                    : "hover:scale-110"
+                    : "ring-2 ring-primary hover:scale-110"
                     }`}
                 aria-label={isOpen ? "Cerrar asistente" : "Abrir asistente virtual"}
             >
@@ -245,12 +236,9 @@ export function VirtualAssistant() {
                         <X className="w-6 h-6 text-white" />
                     </div>
                 ) : (
-                    <video
-                        src="/pali-animado.mp4"
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
+                    <img
+                        src="/migue-animado.webp"
+                        alt=""
                         className="w-full h-full object-cover"
                     />
                 )}
