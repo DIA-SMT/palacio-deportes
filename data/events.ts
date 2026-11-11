@@ -102,10 +102,27 @@ export async function getEventBySlug(slug: string): Promise<Event | null> {
 }
 
 /** Create a new event */
-export async function createEvent(event: Omit<Event, 'id'>): Promise<Event | null> {
+/** Returns `base`, or `base-2`, `base-3`... if an event already uses that slug */
+async function getUniqueSlug(base: string): Promise<string> {
   const { data, error } = await supabase
     .from('events')
-    .insert(toDbRow(event))
+    .select('slug')
+    .like('slug', `${base}%`);
+
+  if (error) throw error;
+  const taken = new Set((data ?? []).map((row) => row.slug));
+  if (!taken.has(base)) return base;
+
+  let n = 2;
+  while (taken.has(`${base}-${n}`)) n++;
+  return `${base}-${n}`;
+}
+
+export async function createEvent(event: Omit<Event, 'id'>): Promise<Event | null> {
+  const slug = await getUniqueSlug(event.slug);
+  const { data, error } = await supabase
+    .from('events')
+    .insert(toDbRow({ ...event, slug }))
     .select()
     .single();
 

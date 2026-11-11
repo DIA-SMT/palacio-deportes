@@ -58,7 +58,7 @@ function generateSlug(title: string): string {
         .replace(/[^a-z0-9\s-]/g, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')
-        .trim();
+        .replace(/^-|-$/g, ''); // No leading/trailing hyphens (e.g. "Dillom " -> "dillom")
 }
 
 const categoryLabels: Record<EventCategory, string> = {
@@ -268,7 +268,11 @@ export default function AdminEventsPage() {
             setFormOpen(false);
             fetchEvents();
         } catch (err: any) {
-            setFormError(err?.message || 'Error al guardar el evento');
+            setFormError(
+                err?.code === '23505'
+                    ? 'Ya existe un evento con ese enlace. Cambiá el título o revisá si el evento ya está cargado.'
+                    : err?.message || 'Error al guardar el evento'
+            );
         }
         setSaving(false);
     }
